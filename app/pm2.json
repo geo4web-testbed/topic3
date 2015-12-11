@@ -3,7 +3,7 @@
     {
       "name": "geo4web",
       "script": "src/app.js",
-      "watch": false,
+      "watch": ["src"],
       "env": {
         "NODE_ENV": "production"
       }

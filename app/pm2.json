@@ -1,0 +1,12 @@
+{
+  "apps" : [
+    {
+      "name": "geo4web",
+      "script": "src/app.js",
+      "watch": false,
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}

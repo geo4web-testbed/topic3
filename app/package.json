@@ -1,0 +1,25 @@
+{
+  "name": "geo4web",
+  "version": "0.0.1",
+  "description": "Frontend application for Geo4web testbed.",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:geo4web-testbed/topic3.git"
+  },
+  "author": "Apiwise <info@apiwise.nl>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/geo4web-testbed/topic3/issues"
+  },
+  "homepage": "https://github.com/geo4web-testbed/topic3",
+  "dependencies": {
+    "express": "^4.13.3"
+  },
+  "devDependencies": {
+    "flightplan": "^0.6.7"
+  }
+}

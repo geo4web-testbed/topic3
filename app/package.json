@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/geo4web-testbed/topic3",
   "dependencies": {
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "winston": "^2.1.1",
+    "winston-logstash": "^0.2.11"
   },
   "devDependencies": {
     "flightplan": "^0.6.7"

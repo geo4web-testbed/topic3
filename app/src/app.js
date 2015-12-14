@@ -1,6 +1,13 @@
 'use strict';
 
-var app = require('express')();
+var app = require('express')(),
+  logger = require('./middleware/logger.js');
+
+// Gets IP from X-Forwarded-For header
+app.set('trust proxy', true);
+
+// Log to Logstash
+app.use(logger());
 
 app.get('/', function(req, res) {
   res.send('Geo4web!');

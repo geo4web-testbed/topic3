@@ -96,30 +96,46 @@ function getDbpediaQuery(uriSegments) {
         }
       }
     }
-  } else if (matches = uriSegments[1].match(/^(.+),_(.+)\(wijk\)$/)) {
+  } else if (matches = uriSegments[1].match(/^(.+),_(.+)_\(wijk\)$/)) {
     params.type = 'wijk';
     params.body = {
       query: {
         filtered: {
           filter: {
-            term: {
-              'properties.WK_NAAM': matches[1].replace(/_/g, ' '),
-              'properties.GM_NAAM': matches[2].replace(/_/g, ' ')
-            }
+            and: [
+              {
+                term: {
+                  'properties.GM_NAAM': matches[2].replace(/_/g, ' ')
+                }
+              },
+              {
+                term: {
+                  'properties.WK_NAAM': matches[1].replace(/_/g, ' ')
+                }
+              }
+            ]
           }
         }
       }
     }
-  } else if (matches = uriSegments[1].match(/^(.+),_(.+)\(buurt\)$/)) {
+  } else if (matches = uriSegments[1].match(/^(.+),_(.+)_\(buurt\)$/)) {
     params.type = 'buurt';
     params.body = {
       query: {
         filtered: {
           filter: {
-            term: {
-              'properties.BU_NAAM': matches[1].replace(/_/g, ' '),
-              'properties.GM_NAAM': matches[2].replace(/_/g, ' ')
-            }
+            and: [
+              {
+                term: {
+                  'properties.GM_NAAM': matches[2].replace(/_/g, ' ')
+                }
+              },
+              {
+                term: {
+                  'properties.BU_NAAM': matches[1].replace(/_/g, ' ')
+                }
+              }
+            ]
           }
         }
       }
@@ -194,10 +210,18 @@ function handleHierarchicalResource(uriSegments, res) {
       query: {
         filtered: {
           filter: {
-            term: {
-              'properties.BU_NAAM': uriSegments[2].replace(/_/g, ' '),
-              'properties.GM_NAAM': uriSegments[0].replace(/_/g, ' ')
-            }
+            and: [
+              {
+                term: {
+                  'properties.GM_NAAM': uriSegments[0].replace(/_/g, ' ')
+                }
+              },
+              {
+                term: {
+                  'properties.BU_NAAM': uriSegments[2].replace(/_/g, ' '),
+                }
+              }
+            ]
           }
         }
       }
@@ -208,10 +232,18 @@ function handleHierarchicalResource(uriSegments, res) {
       query: {
         filtered: {
           filter: {
-            term: {
-              'properties.WK_NAAM': uriSegments[1].replace(/_/g, ' '),
-              'properties.GM_NAAM': uriSegments[0].replace(/_/g, ' ')
-            }
+            and: [
+              {
+                term: {
+                  'properties.GM_NAAM': uriSegments[0].replace(/_/g, ' ')
+                }
+              },
+              {
+                term: {
+                  'properties.WK_NAAM': uriSegments[1].replace(/_/g, ' '),
+                }
+              }
+            ]
           }
         }
       }

@@ -34,7 +34,21 @@ Promise.resolve().then(function() {
               type: 'geo_shape'
             },
             properties: {
-              type: 'object'
+              type: 'object',
+              properties: {
+                GM_CODE: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                GM_NAAM: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                WATER: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                }
+              }
             }
           }
         },
@@ -48,7 +62,29 @@ Promise.resolve().then(function() {
               type: 'geo_shape'
             },
             properties: {
-              type: 'object'
+              type: 'object',
+              properties: {
+                WK_CODE: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                WK_NAAM: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                GM_CODE: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                GM_NAAM: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                WATER: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                }
+              }
             }
           }
         },
@@ -62,7 +98,33 @@ Promise.resolve().then(function() {
               type: 'geo_shape'
             },
             properties: {
-              type: 'object'
+              type: 'object',
+              properties: {
+                BU_CODE: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                BU_NAAM: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                WK_CODE: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                GM_CODE: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                GM_NAAM: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                },
+                WATER: {
+                  type: 'string',
+                  index: 'not_analyzed'
+                }
+              }
             }
           }
         }

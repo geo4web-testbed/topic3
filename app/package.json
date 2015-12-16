@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/geo4web-testbed/topic3",
   "dependencies": {
+    "elasticsearch": "^10.0.1",
     "express": "^4.13.3",
     "winston": "^2.1.1",
     "winston-logstash": "^0.2.11"

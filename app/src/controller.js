@@ -12,18 +12,24 @@ module.exports = function(req, res) {
   switch (uriSegments[0]) {
     case 'page':
       result = handleDbpediaPage(uriSegments, res);
+      break;
     case 'resource':
       result = handleDbpediaResource(uriSegments, res);
+      break;
     case 'doc':
       result = handlePldnDoc(uriSegments, res);
+      break;
     case 'id':
       result = handlePldnId(uriSegments, res);
+      break;
     case 'gemeente':
     case 'wijk':
     case 'buurt':
       result = handleRestResource(uriSegments, res);
+      break;
     case 'unstructured':
       result = handleUnstructuredResource(uriSegments, res);
+      break;
     default:
       result = handleHierarchicalResource(uriSegments, res);
   }

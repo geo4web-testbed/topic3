@@ -23,19 +23,17 @@ var logger = new (winston.Logger)({
   transports: transports
 });
 
-module.exports = function() {
-  return function(req, res, next) {
-    next();
+module.exports = function(req, res, next) {
+  next();
 
-    logger.info(req.method + ' ' + req.originalUrl, {
-      request: {
-        url: req.originalUrl,
-        method: req.method,
-        query: req.query,
-        ip: req.ip,
-        accept: req.get('Accept'),
-        agent: req.get('User-Agent')
-      }
-    });
-  };
+  logger.info(req.method + ' ' + req.originalUrl, {
+    request: {
+      url: req.originalUrl,
+      method: req.method,
+      query: req.query,
+      ip: req.ip,
+      accept: req.get('Accept'),
+      agent: req.get('User-Agent')
+    }
+  });
 };

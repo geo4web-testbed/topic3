@@ -1,6 +1,7 @@
-doctype html
-html(lang="nl")
-  head
-    title Titel
-  body
-    h1 Titel
+extends _layout
+block title
+  title= object.properties.GM_NAAM
+block jsonld
+  script(type='application/ld+json')!= jsonld
+block content
+  h1= object.properties.GM_NAAM

@@ -2,6 +2,18 @@ extends _layout
 block title
   title= object.properties.GM_NAAM
 block jsonld
-  script(type='application/ld+json')!= jsonld
+  script(type='application/ld+json')!= JSON.stringify(jsonld)
 block content
   h1= object.properties.GM_NAAM
+  div(id='map', style='height: 500px; width: 500px;')
+  script(type='text/javascript').
+    var map = L.map('map');
+    var geoJson = L.geoJson(!{JSON.stringify(object.geometry)});
+    geoJson.addTo(map);
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    	attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery Ã‚Â© <a href="http://mapbox.com">Mapbox</a>',
+    	maxZoom: 18,
+      opacity: 0.7,
+    	boxZoom: false
+    }).addTo(map);
+    map.fitBounds(geoJson.getBounds());

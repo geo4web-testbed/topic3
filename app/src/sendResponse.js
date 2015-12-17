@@ -12,13 +12,14 @@ module.exports = function(req, res, data, status) {
         res.send(
           jade.renderFile('./templates/base.jade', {
             object: data,
-            jsonld: JSON.stringify({
+            jsonld: {
               '@context': 'http://schema.org',
               '@type': 'Place',
               geo: geojson2schema({
-                geoJson: data.geometry
+                geoJson: data.geometry,
+                tolerance: 0.01
               })
-            })
+            }
           })
         );
       } catch(err) {

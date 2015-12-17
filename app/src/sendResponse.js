@@ -1,6 +1,10 @@
 var jade = require('jade');
 
-module.exports = function(req, res, data) {
+module.exports = function(req, res, data, status) {
+  if (status !== undefined) {
+    res.status(status);
+  }
+
   res.format({
     'text/html': function() {
       res.send(

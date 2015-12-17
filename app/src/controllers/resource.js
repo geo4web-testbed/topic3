@@ -14,26 +14,33 @@ module.exports = function(req, res) {
   switch (uriSegments[0]) {
     case 'page':
       result = handleDbpediaPage(uriSegments);
+      res.locals.uriStrategy = 'dbpedia';
       break;
     case 'resource':
       result = handleDbpediaResource(uriSegments);
+      res.locals.uriStrategy = 'dbpedia';
       break;
     case 'doc':
       result = handlePldnDoc(uriSegments);
+      res.locals.uriStrategy = 'pldn';
       break;
     case 'id':
       result = handlePldnId(uriSegments);
+      res.locals.uriStrategy = 'pldn';
       break;
     case 'gemeente':
     case 'wijk':
     case 'buurt':
       result = handleRestResource(uriSegments);
+      res.locals.uriStrategy = 'rest';
       break;
     case 'unstructured':
       result = handleUnstructuredResource(uriSegments);
+      res.locals.uriStrategy = 'unstructured';
       break;
     default:
       result = handleHierarchicalResource(uriSegments);
+      res.locals.uriStrategy = 'hierarchical';
   }
 
   result.then(function(data) {

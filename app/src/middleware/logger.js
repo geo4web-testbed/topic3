@@ -26,7 +26,7 @@ var logger = new (winston.Logger)({
 module.exports = function(req, res, next) {
   next();
 
-  logger.info(req.method + ' ' + req.originalUrl, {
+  var log = {
     request: {
       url: req.originalUrl,
       method: req.method,
@@ -35,5 +35,11 @@ module.exports = function(req, res, next) {
       accept: req.get('Accept'),
       agent: req.get('User-Agent')
     }
-  });
+  };
+
+  if (res.locals.uriStrategy) {
+    log.uriStrategy = res.locals.uriStrategy;
+  }
+
+  logger.info(req.method + ' ' + req.originalUrl, log);
 };

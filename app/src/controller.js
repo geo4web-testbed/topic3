@@ -1,4 +1,6 @@
-var elasticsearch = require('elasticsearch');
+var elasticsearch = require('elasticsearch'),
+  createError = require('http-errors'),
+  sendResponse = require('./sendResponse');
 
 var esClient = new elasticsearch.Client({
   host: 'https://search-geo4web-if2ippqsoax25uzkvf7qkazw7m.eu-west-1.es.amazonaws.com',
@@ -11,69 +13,67 @@ module.exports = function(req, res) {
 
   switch (uriSegments[0]) {
     case 'page':
-      result = handleDbpediaPage(uriSegments, res);
+      result = handleDbpediaPage(uriSegments);
       break;
     case 'resource':
-      result = handleDbpediaResource(uriSegments, res);
+      result = handleDbpediaResource(uriSegments);
       break;
     case 'doc':
-      result = handlePldnDoc(uriSegments, res);
+      result = handlePldnDoc(uriSegments);
       break;
     case 'id':
-      result = handlePldnId(uriSegments, res);
+      result = handlePldnId(uriSegments);
       break;
     case 'gemeente':
     case 'wijk':
     case 'buurt':
-      result = handleRestResource(uriSegments, res);
+      result = handleRestResource(uriSegments);
       break;
     case 'unstructured':
-      result = handleUnstructuredResource(uriSegments, res);
+      result = handleUnstructuredResource(uriSegments);
       break;
     default:
-      result = handleHierarchicalResource(uriSegments, res);
+      result = handleHierarchicalResource(uriSegments);
   }
 
-  result.catch(function(err) {
-    if (err.status === 404) {
-      return notFoundError(res);
+  result.then(function(data) {
+    sendResponse(req, res, data);
+  }).catch(function(err) {
+    if (err.status === 303) {
+      return res.redirect(303, err.message);
     }
 
-    unknownServerError(res);
-  })
+    if (err.status === 404) {
+      return res.status(err.status).send({
+        message: err.message
+      });
+    }
+
+    res.status(500).send({
+      message: 'Internal Server Error'
+    });
+  });
 };
 
-function notFoundError(res) {
-  res.status(404).send({
-    message: 'Not found.'
-  });
-}
-
-function unknownServerError(res) {
-  res.status(500).send({
-    message: 'Unknown server error.'
-  });
-}
-
-function handleDbpediaPage(uriSegments, res) {
+function handleDbpediaPage(uriSegments) {
   return esClient.search(getDbpediaQuery(uriSegments))
     .then(function(result) {
       if (result.hits.total === 0) {
-        return notFoundError(res);
+        throw new createError.NotFound();
       }
 
-      res.send(result.hits.hits[0]._source);
+      return result.hits.hits[0]._source;
     });
 }
 
-function handleDbpediaResource(uriSegments, res) {
+function handleDbpediaResource(uriSegments) {
   return esClient.searchExists(getDbpediaQuery(uriSegments))
-    .then(function(result) {
-      res.redirect(303, '/page/' + uriSegments[1]);
-    }).catch(function(err) {
+    .catch(function(err) {
       if (err && err.status === 404) {
-        return notFoundError(res);
+        throw new createError.NotFound();
       }
+    }).then(function(result) {
+      throw createError(303, '/page/' + uriSegments[1]);
     });
 }
 
@@ -145,48 +145,48 @@ function getDbpediaQuery(uriSegments) {
   return params;
 }
 
-function handlePldnDoc(uriSegments, res) {
+function handlePldnDoc(uriSegments) {
   return esClient.get({
     index: 'wijken_buurten_2014',
     type: uriSegments[1],
     id: uriSegments[2]
   }).then(function(result) {
-    res.send(result._source);
+    return result._source;
   });
 }
 
-function handlePldnId(uriSegments, res) {
-  esClient.exists({
+function handlePldnId(uriSegments) {
+  return esClient.exists({
     index: 'wijken_buurten_2014',
     type: uriSegments[1],
     id: uriSegments[2]
-  }, function (err, exists) {
+  }).then(function(exists) {
     if (exists === false) {
-      return notFoundError(res);
+      throw new createError.NotFound();
     }
 
-    res.redirect(303, '/doc/' + uriSegments[1] + '/' + uriSegments[2]);
+    throw createError(303, '/doc/' + uriSegments[1] + '/' + uriSegments[2]);
   });
 }
 
-function handleRestResource(uriSegments, res) {
+function handleRestResource(uriSegments) {
   return esClient.get({
     index: 'wijken_buurten_2014',
     type: uriSegments[0],
     id: uriSegments[1]
   }).then(function(result) {
-    res.send(result._source);
+    return result._source;
   });
 }
 
-function handleUnstructuredResource(uriSegments, res) {
+function handleUnstructuredResource(uriSegments) {
   var obj;
   var buffer = new Buffer(uriSegments[1], 'base64');
 
   try {
     obj = JSON.parse(buffer.toString());
   } catch(err) {
-    return notFoundError(res);
+    throw new createError.NotFound();
   }
 
   return esClient.get({
@@ -194,11 +194,11 @@ function handleUnstructuredResource(uriSegments, res) {
     type: obj.type,
     id: obj.id
   }).then(function(result) {
-    res.send(result._source);
+    return result._source;
   });
 }
 
-function handleHierarchicalResource(uriSegments, res) {
+function handleHierarchicalResource(uriSegments) {
   var params = {
     index: 'wijken_buurten_2014',
     size: 1
@@ -265,9 +265,9 @@ function handleHierarchicalResource(uriSegments, res) {
 
   return esClient.search(params).then(function(result) {
     if (result.hits.total === 0) {
-      return notFoundError(res);
+      throw new createError.NotFound();
     }
 
-    res.send(result.hits.hits[0]._source);
+    return result.hits.hits[0]._source;
   });
 }

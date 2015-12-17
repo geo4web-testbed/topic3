@@ -56,7 +56,13 @@ module.exports = function(req, res) {
 };
 
 function handleDbpediaPage(uriSegments) {
-  return esClient.search(getDbpediaQuery(uriSegments))
+  try {
+    var params = getDbpediaSearchParams(uriSegments);
+  } catch(err) {
+    return Promise.reject(err);
+  }
+
+  return esClient.search(params)
     .then(function(result) {
       if (result.hits.total === 0) {
         throw new createError.NotFound();
@@ -67,7 +73,13 @@ function handleDbpediaPage(uriSegments) {
 }
 
 function handleDbpediaResource(uriSegments) {
-  return esClient.searchExists(getDbpediaQuery(uriSegments))
+  try {
+    var params = getDbpediaSearchParams(uriSegments);
+  } catch(err) {
+    return Promise.reject(err);
+  }
+
+  return esClient.searchExists(params)
     .catch(function(err) {
       if (err && err.status === 404) {
         throw new createError.NotFound();
@@ -77,7 +89,7 @@ function handleDbpediaResource(uriSegments) {
     });
 }
 
-function getDbpediaQuery(uriSegments) {
+function getDbpediaSearchParams(uriSegments) {
   var params = {
     index: 'wijken_buurten_2014',
     size: 1
@@ -140,6 +152,8 @@ function getDbpediaQuery(uriSegments) {
         }
       }
     }
+  } else {
+    throw new createError.NotFound();
   }
 
   return params;

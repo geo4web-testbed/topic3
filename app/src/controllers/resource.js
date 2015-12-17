@@ -1,6 +1,6 @@
 var elasticsearch = require('elasticsearch'),
   createError = require('http-errors'),
-  sendResponse = require('./sendResponse');
+  sendResponse = require('../sendResponse');
 
 var esClient = new elasticsearch.Client({
   host: 'https://search-geo4web-if2ippqsoax25uzkvf7qkazw7m.eu-west-1.es.amazonaws.com',
@@ -44,14 +44,14 @@ module.exports = function(req, res) {
     }
 
     if (err.status === 404) {
-      return res.status(err.status).send({
+      return sendResponse(req, res, {
         message: err.message
-      });
+      }, err.status);
     }
 
-    res.status(500).send({
+    sendResponse(req, res, {
       message: 'Internal Server Error'
-    });
+    }, 500);
   });
 };
 

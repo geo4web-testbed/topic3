@@ -2,16 +2,18 @@ doctype html
 html(lang="nl")
   head
     meta(charset='utf-8')
-    meta(name='viewport', content='width=device-width', initial-scale='1')
+    meta(name='viewport', content='width=device-width', initial-scale='1.0')
     block title
       title Geo4Web
     block style
       link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css')
       link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css')
-    block script
-      script(src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js')
+      link(rel='stylesheet', href='/css/style.css')
     block jsonld
   body
     .content.container
-      block content
-  block footer
+      block content 
+    block script
+      script(src='https://code.jquery.com/jquery-2.1.4.min.js')
+      script(src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js')
+      script(src='/js/app.js')

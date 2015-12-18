@@ -9,29 +9,15 @@ block jsonld
 block content
   .page-header
     h1= title
-  div.container-fluid
-    div.row
-      div.col-md-6
-        div(id='map', style='height: 500px;')
-      div.col-md-6
-        table.table
+  div.row
+    div.col-md-6
+      div(class='map-container')
+    div.col-md-6
+      table.table
+        tr
+          th='Property'
+          th='Value'
+        each value, property in object.properties
           tr
-            th='Property'
-            th='Value'
-          each value, property in object.properties
-            tr
-              td=property
-              td=value
-
-block footer
-  script(type='text/javascript').
-    var map = L.map('map');
-    var geoJson = L.geoJson(!{JSON.stringify(object.geometry)});
-    geoJson.addTo(map);
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    	attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery Ã‚Â© <a href="http://mapbox.com">Mapbox</a>',
-    	maxZoom: 18,
-      opacity: 0.7,
-    	boxZoom: false
-    }).addTo(map);
-    map.fitBounds(geoJson.getBounds());
+            td=property
+            td=value

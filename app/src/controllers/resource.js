@@ -4,7 +4,7 @@ var elasticsearch = require('elasticsearch'),
 
 var esClient = new elasticsearch.Client({
   host: 'https://search-geo4web-if2ippqsoax25uzkvf7qkazw7m.eu-west-1.es.amazonaws.com',
-  log: process.env.NODE_ENV === 'production' ? 'error' : 'trace'
+  log: process.env.NODE_ENV === 'production' ? 'error' : 'debug'
 });
 
 module.exports = function(req, res) {

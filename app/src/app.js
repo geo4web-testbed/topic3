@@ -10,11 +10,11 @@ app.disable('x-powered-by');
 // Gets IP from X-Forwarded-For header
 app.set('trust proxy', true);
 
-// Log to Logstash
-app.use(logger);
-
 // Serve assets dir
 app.use(serveStatic('assets', { index: false }));
+
+// Log to Logstash
+app.use(logger);
 
 // Catch-all controller
 app.get('/', require('./controllers/index'));

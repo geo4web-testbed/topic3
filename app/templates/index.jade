@@ -1,4 +1,98 @@
 extends _layout
 
 block vars
-  - var title = 'Index'
+  - var title = 'Geo4Web Topic 3'
+
+block content
+  div.row
+    p
+      :markdown
+        This is the index page of the Geo4Web Topic 3 research page. 
+        The URIs below are meant to test different URI strategies for the Dutch 
+        municipality of Amersfoort. More information about these URI strategies
+        can be found on our Wiki: [https://github.com/geo4web-testbed/topic3/wiki/URI-Strategy](https://github.com/geo4web-testbed/topic3/wiki/URI-Strategy).
+    table.table
+      thead
+        tr
+          th(colspan='3') DBPedia URIs
+      tbody
+        tr
+          td.left-column Municipality
+          td
+            a(href='/page/Amersfoort_(gemeente)') https://geo4web.apiwise.nl/page/Amersfoort_(gemeente)
+        tr
+          td.left-column Quarter
+          td
+            a(href='/page/Wijk_01_Stadskern,_Amersfoort_(wijk)') https://geo4web.apiwise.nl/page/Wijk_01_Stadskern,_Amersfoort_(wijk)
+        tr
+          td.left-column Neighbourhood
+          td
+            a(href='/page/Stadhuisplein,_Amersfoort_(buurt)') https://geo4web.apiwise.nl/page/Stadhuisplein,_Amersfoort_(buurt)
+    table.table
+      thead
+        tr
+          th(colspan='3') Hierarchical URIs
+      tbody
+        tr
+          td.left-column Municipality
+          td
+            a(href='/Amersfoort') https://geo4web.apiwise.nl/Amersfoort
+        tr
+          td.left-column Quarter
+          td
+            a(href='/Amersfoort/Wijk_01_Stadskern') https://geo4web.apiwise.nl/Amersfoort/Wijk_01_Stadskern
+        tr
+          td.left-column Neighbourhood
+          td
+            a(href='/Amersfoort/Wijk_01_Stadskern/Stadhuisplein') https://geo4web.apiwise.nl/Amersfoort/Wijk_01_Stadskern/Stadhuisplein
+    table.table
+      thead
+        tr
+          th(colspan='3') RESTful URIs
+      tbody
+        tr
+          td.left-column Municipality
+          td
+            a(href='/gemeente/GM0307') https://geo4web.apiwise.nl/gemeente/GM0307
+        tr
+          td.left-column Quarter
+          td
+            a(href='/wijk/WK030701') https://geo4web.apiwise.nl/wijk/WK030701
+        tr
+          td.left-column Neighbourhood
+          td
+            a(href='/buurt/BU03070107') https://geo4web.apiwise.nl/buurt/BU03070107
+    table.table
+      thead
+        tr
+          th(colspan='3') Dutch Linked Data URI Strategy
+      tbody
+        tr
+          td.left-column Municipality
+          td
+            a(href='/doc/gemeente/GM0307') https://geo4web.apiwise.nl/doc/gemeente/GM0307
+        tr
+          td.left-column Quarter
+          td
+            a(href='/doc/wijk/WK030701') https://geo4web.apiwise.nl/doc/wijk/WK030701
+        tr
+          td.left-column Neighbourhood
+          td
+            a(href='/doc/buurt/BU03070107') https://geo4web.apiwise.nl/doc/buurt/BU03070107
+    table.table
+      thead
+        tr
+          th(colspan='3') Unstructured URIs
+      tbody
+        tr
+          td.left-column Municipality
+          td
+            a(href='/unstructured/eyJ0eXBlIjoiZ2VtZWVudGUiLCJpZCI6IkdNMDMwNyJ9') https://geo4web.apiwise.nl/unstructured/eyJ0eXBlIjoiZ2VtZWVudGUiLCJpZCI6IkdNMDMwNyJ9
+        tr
+          td.left-column Quarter
+          td
+            a(href='/unstructured/eyJ0eXBlIjoid2lqayIsImlkIjoiV0swMzA3MDEifQ==') https://geo4web.apiwise.nl/unstructured/eyJ0eXBlIjoid2lqayIsImlkIjoiV0swMzA3MDEifQ==
+        tr
+          td.left-column Neighbourhood
+          td
+            a(href='/unstructured/eyJ0eXBlIjoiYnV1cnQiLCJpZCI6IkJVMDMwNzAxMDcifQ==') https://geo4web.apiwise.nl/unstructured/eyJ0eXBlIjoiYnV1cnQiLCJpZCI6IkJVMDMwNzAxMDcifQ==

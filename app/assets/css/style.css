@@ -13,3 +13,7 @@ html, body, .container, .row {
     max-height: 600px;
   }
 }
+
+.left-column {
+  width: 250px;
+}

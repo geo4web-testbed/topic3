@@ -13,14 +13,16 @@ block vars
 
 block content
   div.row
-    .col-md-6.col-map
-      .map-container
     .col-md-6
       table.table
-        tr
-          th='Property'
-          th='Value'
+        thead
+          tr
+            th='Property'
+            th='Value'
+        tbody
         each value, property in object.properties
           tr
             td=property
             td=value
+    .col-md-6.col-map
+      .map-container

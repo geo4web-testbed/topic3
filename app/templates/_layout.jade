@@ -1,10 +1,11 @@
 doctype html
 html(lang="nl")
+  block vars
+    - var title = 'Geo4Web'
   head
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width', initial-scale='1.0', maximum-scale='1.0', user-scalable='no')
-    block title
-      title Geo4Web
+    title #{title}
     block style
       link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css')
       link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css')
@@ -19,6 +20,8 @@ html(lang="nl")
       ga('send', 'pageview');
   body
     .content.container
+      .page-header
+        h1 #{title}
       block content 
     block script
       script(src='https://code.jquery.com/jquery-2.1.4.min.js')

@@ -44,19 +44,19 @@ module.exports = function(req, res) {
   }
 
   result.then(function(data) {
-    sendResponse(req, res, data);
+    sendResponse(req, res, 'resource', data);
   }).catch(function(err) {
     if (err.status === 303) {
       return res.redirect(303, err.message);
     }
 
     if (err.status === 404) {
-      return sendResponse(req, res, {
+      return sendResponse(req, res, '404', {
         message: err.message
       }, err.status);
     }
 
-    sendResponse(req, res, {
+    sendResponse(req, res, '500', {
       message: 'Internal Server Error'
     }, 500);
   });

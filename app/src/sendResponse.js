@@ -1,7 +1,7 @@
 var jade = require('jade'),
   geojson2schema = require('geojson2schema');
 
-module.exports = function(req, res, data, status) {
+module.exports = function(req, res, template, data, status) {
   if (status !== undefined) {
     res.status(status);
   }
@@ -10,22 +10,9 @@ module.exports = function(req, res, data, status) {
     'text/html': function() {
       try {
         res.send(
-          jade.renderFile('./templates/base.jade', {
+          jade.renderFile('./templates/' + template + '.jade', {
             object: data,
-            title: (
-              data.properties['BU_NAAM'] ? data.properties['BU_NAAM'] : (
-                data.properties['WK_NAAM'] ? data.properties['WK_NAAM'] : (
-                  data.properties['GM_NAAM'] ? data.properties['GM_NAAM'] : 'Geo4Web'
-                )
-              )
-            ),
-            jsonld: {
-              '@context': 'http://schema.org',
-              '@type': 'Place',
-              geo: geojson2schema({
-                geoJson: data.geometry
-              })
-            }
+            geojson2schema: geojson2schema
           })
         );
       } catch(err) {

@@ -1,4 +1,15 @@
-.map-container {
-  width: 500px;
-  height: 500px;
+html, body, .container, .row {
+  height: 100%;
+}
+
+.col-map, .map-container {
+  height: 100%;
+  max-height: 300px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .col-map, .map-container {
+    max-height: 600px;
+  }
 }

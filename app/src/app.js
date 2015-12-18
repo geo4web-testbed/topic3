@@ -1,7 +1,8 @@
 'use strict';
 
 var app = require('express')(),
-  logger = require('./middleware/logger');
+  logger = require('./middleware/logger'),
+  serveStatic = require('serve-static');
 
 // Removes Express response header
 app.disable('x-powered-by');
@@ -11,6 +12,9 @@ app.set('trust proxy', true);
 
 // Log to Logstash
 app.use(logger);
+
+// Serve assets dir
+app.use(serveStatic('assets', { index: false }));
 
 // Catch-all controller
 app.get('/', require('./controllers/index'));

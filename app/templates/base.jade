@@ -1,10 +1,14 @@
 extends _layout
+
 block title
   title= object.properties.GM_NAAM
+
 block jsonld
   script(type='application/ld+json')!= JSON.stringify(jsonld)
+
 block content
-  h1= object.properties.GM_NAAM
+  .page-header
+    h1= object.properties.GM_NAAM
   div(id='map', style='height: 500px; width: 500px;')
   script(type='text/javascript').
     var map = L.map('map');

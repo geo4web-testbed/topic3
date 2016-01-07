@@ -19,7 +19,13 @@ module.exports = function(req, res, template, data, status) {
         console.error(err);
       }
     },
+    'application/vnd.geo+json': function() {
+      res.json(data);
+    },
     'application/json': function() {
+      res.json(data);
+    },
+    'application/ld+json': function() {
       res.json(data);
     },
     default: function() {

@@ -8,43 +8,38 @@ var esClient = new elasticsearch.Client({
 });
 
 module.exports = function(req, res) {
-  var result;
-  var uriSegments = req.path.substr(1).split('/');
+  var result,
+   uri = 'https://geo4web.apiwise.nl' + req.path,
+   pathSegments = req.path.substr(1).split('/');
 
-  switch (uriSegments[0]) {
+  switch (pathSegments[0]) {
     case 'page':
-      result = handleDbpediaPage(uriSegments);
-      res.locals.uriStrategy = 'dbpedia';
+      result = handleDbpediaPage(uri, pathSegments);
       break;
     case 'resource':
-      result = handleDbpediaResource(uriSegments);
-      res.locals.uriStrategy = 'dbpedia';
+      result = handleDbpediaResource(uri.replace('/resource/', '/page/'), pathSegments);
       break;
     case 'doc':
-      result = handlePldnDoc(uriSegments);
-      res.locals.uriStrategy = 'pldn';
+      result = handlePldnDoc(uri, pathSegments);
       break;
     case 'id':
-      result = handlePldnId(uriSegments);
-      res.locals.uriStrategy = 'pldn';
+      result = handlePldnId(uri.replace('/id/', '/doc/'), pathSegments);
       break;
     case 'gemeente':
     case 'wijk':
     case 'buurt':
-      result = handleRestResource(uriSegments);
-      res.locals.uriStrategy = 'rest';
+      result = handleRestResource(uri, pathSegments);
       break;
     case 'unstructured':
-      result = handleUnstructuredResource(uriSegments);
-      res.locals.uriStrategy = 'unstructured';
+      result = handleUnstructuredResource(uri, pathSegments);
       break;
     default:
-      result = handleHierarchicalResource(uriSegments);
-      res.locals.uriStrategy = 'hierarchical';
+      result = handleHierarchicalResource(uri, pathSegments);
   }
 
   result.then(function(data) {
-    sendResponse(req, res, 'resource', data);
+    res.locals.uriStrategy = data.meta.uriStrategy;
+    sendResponse(req, res, 'resource', data.doc);
   }).catch(function(err) {
     if (err.status === 303) {
       return res.redirect(303, err.message);
@@ -62,233 +57,114 @@ module.exports = function(req, res) {
   });
 };
 
-function handleDbpediaPage(uriSegments) {
+function handleDbpediaPage(uri, pathSegments) {
   try {
-    var params = getDbpediaSearchParams(uriSegments);
+    var params = getDbpediaSearchParams(uri, pathSegments);
   } catch(err) {
     return Promise.reject(err);
   }
 
-  return esClient.search(params)
+  return esClient.get(params)
     .then(function(result) {
-      if (result.hits.total === 0) {
-        throw new createError.NotFound();
-      }
-
-      return result.hits.hits[0]._source;
+      return result._source;
     });
 }
 
-function handleDbpediaResource(uriSegments) {
+function handleDbpediaResource(uri, pathSegments) {
   try {
-    var params = getDbpediaSearchParams(uriSegments);
+    var params = getDbpediaSearchParams(uri, pathSegments);
   } catch(err) {
     return Promise.reject(err);
   }
 
-  return esClient.searchExists(params)
-    .catch(function(err) {
-      if (err && err.status === 404) {
+  return esClient.exists(params)
+    .then(function(exists) {
+      if (!exists) {
         throw new createError.NotFound();
       }
-    }).then(function(result) {
-      throw createError(303, '/page/' + uriSegments[1]);
+
+      throw createError(303, '/page/' + pathSegments[1]);
     });
 }
 
-function getDbpediaSearchParams(uriSegments) {
+function getDbpediaSearchParams(uri, pathSegments) {
   var params = {
     index: 'wijken_buurten_2014',
-    size: 1
+    id: uri
   };
 
-  if (matches = uriSegments[1].match(/^(.+)_\(gemeente\)$/)) {
-    params.type = 'gemeente';
-    params.body = {
-      query: {
-        filtered: {
-          filter: {
-            term: {
-              'properties.GM_NAAM': matches[1].replace(/_/g, ' '),
-            }
-          }
-        }
-      }
-    }
-  } else if (matches = uriSegments[1].match(/^(.+),_(.+)_\(wijk\)$/)) {
-    params.type = 'wijk';
-    params.body = {
-      query: {
-        filtered: {
-          filter: {
-            and: [
-              {
-                term: {
-                  'properties.GM_NAAM': matches[2].replace(/_/g, ' ')
-                }
-              },
-              {
-                term: {
-                  'properties.WK_NAAM': matches[1].replace(/_/g, ' ')
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
-  } else if (matches = uriSegments[1].match(/^(.+),_(.+)_\(buurt\)$/)) {
-    params.type = 'buurt';
-    params.body = {
-      query: {
-        filtered: {
-          filter: {
-            and: [
-              {
-                term: {
-                  'properties.GM_NAAM': matches[2].replace(/_/g, ' ')
-                }
-              },
-              {
-                term: {
-                  'properties.BU_NAAM': matches[1].replace(/_/g, ' ')
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
-  } else {
-    throw new createError.NotFound();
-  }
+  if (matches = pathSegments[1].match(/^(.+)_\(gemeente\)$/)) params.type = 'gemeente';
+  else if (matches = pathSegments[1].match(/^(.+),_(.+)_\(wijk\)$/)) params.type = 'wijk';
+  else if (matches = pathSegments[1].match(/^(.+),_(.+)_\(buurt\)$/)) params.type = 'buurt';
+  else throw new createError.NotFound();
 
   return params;
 }
 
-function handlePldnDoc(uriSegments) {
+function handlePldnDoc(uri, pathSegments) {
   return esClient.get({
     index: 'wijken_buurten_2014',
-    type: uriSegments[1],
-    id: uriSegments[2]
+    type: pathSegments[1],
+    id: uri
   }).then(function(result) {
     return result._source;
   });
 }
 
-function handlePldnId(uriSegments) {
+function handlePldnId(uri, pathSegments) {
   return esClient.exists({
     index: 'wijken_buurten_2014',
-    type: uriSegments[1],
-    id: uriSegments[2]
+    type: pathSegments[1],
+    id: uri
   }).then(function(exists) {
-    if (exists === false) {
+    if (!exists) {
       throw new createError.NotFound();
     }
 
-    throw createError(303, '/doc/' + uriSegments[1] + '/' + uriSegments[2]);
+    throw createError(303, '/doc/' + pathSegments[1] + '/' + pathSegments[2]);
   });
 }
 
-function handleRestResource(uriSegments) {
+function handleRestResource(uri, pathSegments) {
   return esClient.get({
     index: 'wijken_buurten_2014',
-    type: uriSegments[0],
-    id: uriSegments[1]
+    type: pathSegments[0],
+    id: uri
   }).then(function(result) {
     return result._source;
   });
 }
 
-function handleUnstructuredResource(uriSegments) {
+function handleUnstructuredResource(uri, pathSegments) {
   var obj;
-  var buffer = new Buffer(uriSegments[1], 'base64');
+  var buffer = new Buffer(pathSegments[1], 'base64');
 
   try {
     obj = JSON.parse(buffer.toString());
   } catch(err) {
-    throw new createError.NotFound();
+    return Promise.reject(new createError.NotFound());
   }
 
   return esClient.get({
     index: 'wijken_buurten_2014',
     type: obj.type,
-    id: obj.id
+    id: uri
   }).then(function(result) {
     return result._source;
   });
 }
 
-function handleHierarchicalResource(uriSegments) {
+function handleHierarchicalResource(uri, pathSegments) {
   var params = {
     index: 'wijken_buurten_2014',
-    size: 1
+    id: uri
   };
 
-  if (uriSegments[2]) {
-    params.type = 'buurt';
-    params.body = {
-      query: {
-        filtered: {
-          filter: {
-            and: [
-              {
-                term: {
-                  'properties.GM_NAAM': uriSegments[0].replace(/_/g, ' ')
-                }
-              },
-              {
-                term: {
-                  'properties.BU_NAAM': uriSegments[2].replace(/_/g, ' '),
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
-  } else if (uriSegments[1]) {
-    params.type = 'wijk';
-    params.body = {
-      query: {
-        filtered: {
-          filter: {
-            and: [
-              {
-                term: {
-                  'properties.GM_NAAM': uriSegments[0].replace(/_/g, ' ')
-                }
-              },
-              {
-                term: {
-                  'properties.WK_NAAM': uriSegments[1].replace(/_/g, ' '),
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
-  } else {
-    params.type = 'gemeente';
-    params.body = {
-      query: {
-        filtered: {
-          filter: {
-            term: {
-              'properties.GM_NAAM': uriSegments[0].replace(/_/g, ' ')
-            }
-          }
-        }
-      }
-    }
-  }
+  if (pathSegments[2]) params.type = 'buurt';
+  else if (pathSegments[1]) params.type = 'wijk';
+  else params.type = 'gemeente';
 
-  return esClient.search(params).then(function(result) {
-    if (result.hits.total === 0) {
-      throw new createError.NotFound();
-    }
-
-    return result.hits.hits[0]._source;
+  return esClient.get(params).then(function(result) {
+    return result._source;
   });
 }

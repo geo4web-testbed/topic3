@@ -15,30 +15,36 @@ module.exports = function(req, res) {
   switch (pathSegments[0]) {
     case 'page':
       result = handleDbpediaPage(uri, pathSegments);
+      res.locals.uriStrategy = 'dbpedia';
       break;
     case 'resource':
       result = handleDbpediaResource(uri.replace('/resource/', '/page/'), pathSegments);
+      res.locals.uriStrategy = 'dbpedia';
       break;
     case 'doc':
       result = handlePldnDoc(uri, pathSegments);
+      res.locals.uriStrategy = 'pldn';
       break;
     case 'id':
       result = handlePldnId(uri.replace('/id/', '/doc/'), pathSegments);
+      res.locals.uriStrategy = 'pldn';
       break;
     case 'gemeente':
     case 'wijk':
     case 'buurt':
       result = handleRestResource(uri, pathSegments);
+      res.locals.uriStrategy = 'rest';
       break;
     case 'unstructured':
       result = handleUnstructuredResource(uri, pathSegments);
+      res.locals.uriStrategy = 'unstructured';
       break;
     default:
       result = handleHierarchicalResource(uri, pathSegments);
+      res.locals.uriStrategy = 'hierarchical';
   }
 
   result.then(function(data) {
-    res.locals.uriStrategy = data.meta.uriStrategy;
     sendResponse(req, res, 'resource', data.doc);
   }).catch(function(err) {
     if (err.status === 303) {

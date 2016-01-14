@@ -28,6 +28,9 @@ module.exports = function(req, res, template, data, status) {
     'application/ld+json': function() {
       res.json(data);
     },
+    'application/vnd.google-earth.kml+xml': function() {
+      res.send(tokml(data));
+    },
     default: function() {
       res.status(406).end();
     }

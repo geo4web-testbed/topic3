@@ -12,6 +12,7 @@ proj4.defs('WGS84', '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs');
 proj4.defs('RD', '+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.999908 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 +no_defs no_defs <>');
 
 var reader,
+  uriStrategies = ['dbpedia', 'hierarchical', 'rest', 'pldn', 'unstructured'],
   esClient = new elasticsearch.Client({
     host: 'https://search-geo4web-if2ippqsoax25uzkvf7qkazw7m.eu-west-1.es.amazonaws.com',
     // log: 'trace'
@@ -19,6 +20,8 @@ var reader,
 
 Promise.resolve().then(function() {
   return esClient.indices.delete({ index: 'wijken_buurten_2014' });
+}).catch(function(err) {
+  // Do nothing when index does not exist
 }).then(function() {
   return esClient.indices.create({
     index: 'wijken_buurten_2014',
@@ -26,27 +29,41 @@ Promise.resolve().then(function() {
       mappings: {
         gemeente: {
           properties: {
-            type: {
-              type: 'string',
-              index: 'no'
-            },
-            geometry: {
-              type: 'geo_shape'
-            },
-            properties: {
+            meta: {
               type: 'object',
               properties: {
-                GM_CODE: {
+                uriStrategy: {
                   type: 'string',
                   index: 'not_analyzed'
+                }
+              }
+            },
+            doc: {
+              type: 'object',
+              properties: {
+                type: {
+                  type: 'string',
+                  index: 'no'
                 },
-                GM_NAAM: {
-                  type: 'string',
-                  index: 'not_analyzed'
+                geometry: {
+                  type: 'geo_shape'
                 },
-                WATER: {
-                  type: 'string',
-                  index: 'not_analyzed'
+                properties: {
+                  type: 'object',
+                  properties: {
+                    GM_CODE: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    GM_NAAM: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    WATER: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    }
+                  }
                 }
               }
             }
@@ -54,35 +71,49 @@ Promise.resolve().then(function() {
         },
         wijk: {
           properties: {
-            type: {
-              type: 'string',
-              index: 'no'
-            },
-            geometry: {
-              type: 'geo_shape'
-            },
-            properties: {
+            meta: {
               type: 'object',
               properties: {
-                WK_CODE: {
+                uriStrategy: {
                   type: 'string',
                   index: 'not_analyzed'
+                }
+              }
+            },
+            doc: {
+              type: 'object',
+              properties: {
+                type: {
+                  type: 'string',
+                  index: 'no'
                 },
-                WK_NAAM: {
-                  type: 'string',
-                  index: 'not_analyzed'
+                geometry: {
+                  type: 'geo_shape'
                 },
-                GM_CODE: {
-                  type: 'string',
-                  index: 'not_analyzed'
-                },
-                GM_NAAM: {
-                  type: 'string',
-                  index: 'not_analyzed'
-                },
-                WATER: {
-                  type: 'string',
-                  index: 'not_analyzed'
+                properties: {
+                  type: 'object',
+                  properties: {
+                    WK_CODE: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    WK_NAAM: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    GM_CODE: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    GM_NAAM: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    WATER: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    }
+                  }
                 }
               }
             }
@@ -90,39 +121,57 @@ Promise.resolve().then(function() {
         },
         buurt: {
           properties: {
-            type: {
-              type: 'string',
-              index: 'no'
-            },
-            geometry: {
-              type: 'geo_shape'
-            },
-            properties: {
+            meta: {
               type: 'object',
               properties: {
-                BU_CODE: {
+                uriStrategy: {
                   type: 'string',
                   index: 'not_analyzed'
+                }
+              }
+            },
+            doc: {
+              type: 'object',
+              properties: {
+                type: {
+                  type: 'string',
+                  index: 'no'
                 },
-                BU_NAAM: {
-                  type: 'string',
-                  index: 'not_analyzed'
+                geometry: {
+                  type: 'geo_shape'
                 },
-                WK_CODE: {
-                  type: 'string',
-                  index: 'not_analyzed'
-                },
-                GM_CODE: {
-                  type: 'string',
-                  index: 'not_analyzed'
-                },
-                GM_NAAM: {
-                  type: 'string',
-                  index: 'not_analyzed'
-                },
-                WATER: {
-                  type: 'string',
-                  index: 'not_analyzed'
+                properties: {
+                  type: 'object',
+                  properties: {
+                    BU_CODE: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    BU_NAAM: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    WK_CODE: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    WK_NAAM: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    GM_CODE: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    GM_NAAM: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    },
+                    WATER: {
+                      type: 'string',
+                      index: 'not_analyzed'
+                    }
+                  }
                 }
               }
             }
@@ -135,26 +184,38 @@ Promise.resolve().then(function() {
   reader = Promise.promisifyAll(shapefile.reader('./shapefile/gem_2014'));
   return reader.readHeaderAsync();
 }).then(function() {
-  return importRecord('wijken_buurten_2014', 'gemeente', 'GM_CODE', 'GM_NAAM');
+  return importRecords('wijken_buurten_2014', 'gemeente', 'GM_CODE', 'GM_NAAM');
 }).then(function() {
   reader = Promise.promisifyAll(shapefile.reader('./shapefile/wijk_2014'));
   return reader.readHeaderAsync();
 }).then(function() {
-  return importRecord('wijken_buurten_2014', 'wijk', 'WK_CODE', 'WK_NAAM');
+  return importRecords('wijken_buurten_2014', 'wijk', 'WK_CODE', 'WK_NAAM');
 }).then(function() {
   reader = Promise.promisifyAll(shapefile.reader('./shapefile/buurt_2014'));
   return reader.readHeaderAsync();
 }).then(function() {
-  return importRecord('wijken_buurten_2014', 'buurt', 'BU_CODE', 'BU_NAAM');
+  return importRecords('wijken_buurten_2014', 'buurt', 'BU_CODE', 'BU_NAAM');
 }).catch(function(err) {
   console.error(err);
 });
 
-function importRecord(index, type, idProperty, nameProperty) {
+function importRecords(index, type, idProperty, nameProperty) {
   return reader.readRecordAsync().then(function(record) {
+    if (type === 'buurt') {
+      return getWkNaam(record.properties.WK_CODE).then(function(wkNaam) {
+        record.properties.WK_NAAM = wkNaam;
+        return record;
+      });
+    }
+
+    return record;
+  }).then(function(record) {
     if (record === shapefile.end || record.properties[nameProperty] === null) {
       return;
     }
+
+    var numId = parseInt(record.properties.GM_CODE.substring(2)),
+      uriStrategy = uriStrategies[numId % uriStrategies.length];
 
     switch (record.geometry.type) {
       case 'Polygon':
@@ -180,13 +241,82 @@ function importRecord(index, type, idProperty, nameProperty) {
     return esClient.index({
       index: index,
       type: type,
-      id: record.properties[idProperty],
-      body: record
+      id: generateUri(record, uriStrategy, type, idProperty, nameProperty),
+      body: {
+        meta: { uriStrategy: uriStrategy },
+        doc: record
+      }
     }).catch(function(err) {
       console.error('Error importing: ' + record.properties[idProperty]);
-      return importRecord(index, type, idProperty, nameProperty);
+      return importRecords(index, type, idProperty, nameProperty);
     }).then(function() {
-      return importRecord(index, type, idProperty, nameProperty);
+      return importRecords(index, type, idProperty, nameProperty);
     });
-  })
+  });
+}
+
+function getWkNaam(wkCode) {
+  var params = {
+    index: 'wijken_buurten_2014',
+    type: 'wijk',
+    size: 1,
+    query: {
+      filtered: {
+        filter: {
+          term: {
+            doc: {
+              properties: {
+                WK_CODE: wkCode
+              }
+            }
+          }
+        }
+      }
+    }
+  };
+
+  return esClient.search(params).then(function(result) {
+    if (result.hits.total === 0) {
+      throw new createError.NotFound();
+    }
+
+    return result.hits.hits[0]._source.doc.properties.WK_NAAM;
+  });
+}
+
+function generateUri(record, uriStrategy, type, idProperty, nameProperty) {
+  var uri = 'https://geo4web.apiwise.nl';
+
+  switch (uriStrategy) {
+    case 'dbpedia':
+      uri = uri + '/page/' + escapeValue(record.properties[nameProperty]);
+      if (type !== 'gemeente') uri = uri + ',_' + escapeValue(record.properties['GM_NAAM']);
+      uri = uri + '_(' + type + ')';
+      break;
+    case 'hierarchical':
+      if (type !== 'gemeente') uri = uri + '/' + escapeValue(record.properties['GM_NAAM']);
+      if (type === 'buurt') uri = uri + '/' + escapeValue(record.properties['WK_NAAM']);
+      uri = uri + '/' + escapeValue(record.properties[nameProperty]);
+      break;
+    case 'rest':
+      uri = uri + '/' + type + '/' + record.properties[idProperty];
+      break;
+    case 'pldn':
+      uri = uri + '/doc/' + type + '/' + record.properties[idProperty];
+      break;
+    case 'unstructured':
+      uri = uri + '/unstructured/' + new Buffer(JSON.stringify({
+        id: record.properties[idProperty],
+        type: type
+      })).toString('base64');
+      break;
+    default:
+      throw new Error('URI strategy not supported: ' + uriStrategy);
+  }
+
+  return uri;
+}
+
+function escapeValue(value) {
+  return value.replace(/\s/g, '_');
 }

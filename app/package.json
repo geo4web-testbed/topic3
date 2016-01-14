@@ -22,6 +22,7 @@
     "geojson2schema": "^0.0.2",
     "http-errors": "^1.3.1",
     "jade": "^1.11.0",
+    "jsonld": "^0.4.4",
     "marked": "^0.3.5",
     "tokml": "^0.3.0",
     "winston": "^2.1.1",

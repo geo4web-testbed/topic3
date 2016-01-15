@@ -9,8 +9,14 @@ var esClient = new elasticsearch.Client({
 
 module.exports = function(req, res, next) {
   var result,
-   uri = 'https://geo4web.apiwise.nl' + req.path,
-   pathSegments = req.path.substr(1).split('/');
+    matches,
+    uri = 'https://geo4web.apiwise.nl' + req.path,
+    pathSegments = req.path.substr(1).split('/');
+
+  if (matches = uri.match(/^(.+)\.kml$/)) {
+    uri = matches[1];
+    req.headers.accept = 'application/vnd.google-earth.kml+xml';
+  }
 
   switch (pathSegments[0]) {
     case 'page':
@@ -87,9 +93,9 @@ function getDbpediaSearchParams(uri, pathSegments) {
     id: uri
   };
 
-  if (matches = pathSegments[1].match(/^(.+)_\(gemeente\)$/)) params.type = 'gemeente';
-  else if (matches = pathSegments[1].match(/^(.+),_(.+)_\(wijk\)$/)) params.type = 'wijk';
-  else if (matches = pathSegments[1].match(/^(.+),_(.+)_\(buurt\)$/)) params.type = 'buurt';
+  if (matches = uri.match(/^(.+)_\(gemeente\)$/)) params.type = 'gemeente';
+  else if (matches = uri.match(/^(.+),_(.+)_\(wijk\)$/)) params.type = 'wijk';
+  else if (matches = uri.match(/^(.+),_(.+)_\(buurt\)$/)) params.type = 'buurt';
   else throw new createError.NotFound();
 
   return params;

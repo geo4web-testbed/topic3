@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
   var type, urls
     pathSegments = req.path.split('.');
 
-  if (pathSegments.length === 4) {
+  if (pathSegments.length >= 4) {
     var params = {
       type: pathSegments[1],
       size: 25000,
@@ -26,7 +26,7 @@ module.exports = function(req, res, next) {
       var sm = sitemap.createSitemap({
         urls: result.hits.hits.map(function(hit) {
           return {
-            url: hit._id,
+            url: pathSegments[2] === 'kml' ? hit._id + '.kml' : hit._id,
             changefreq: 'daily'
           };
         })
@@ -47,8 +47,11 @@ module.exports = function(req, res, next) {
     var index = '<?xml version="1.0" encoding="UTF-8"?>';
     index += '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
     index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.gemeente.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
+    index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.gemeente.kml.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
     index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.wijk.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
+    index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.wijk.kml.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
     index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.buurt.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
+    index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.buurt.kml.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
     index += '</sitemapindex>';
 
     res.header('Content-Type', 'application/xml');

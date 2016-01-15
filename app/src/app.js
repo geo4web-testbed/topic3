@@ -1,6 +1,7 @@
 'use strict';
 
 var express = require('express'),
+  errorHandler = require('./middleware/errorHandler'),
   logger = require('./middleware/logger');
 
 var app = express();
@@ -19,7 +20,11 @@ app.use(logger);
 
 // Catch-all controller
 app.get('/', require('./controllers/index'));
+app.get('/sitemap(.*)?.xml.gz', require('./controllers/sitemap'));
 app.get('*', require('./controllers/resource'));
+
+// Handle errors
+app.use(errorHandler);
 
 var server = app.listen(3000, function() {
   console.log('Geo4web app listening at port %d...', server.address().port);

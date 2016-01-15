@@ -7,7 +7,7 @@ var esClient = new elasticsearch.Client({
   log: process.env.NODE_ENV === 'production' ? 'error' : 'debug'
 });
 
-module.exports = function(req, res) {
+module.exports = function(req, res, next) {
   var result,
    uri = 'https://geo4web.apiwise.nl' + req.path,
    pathSegments = req.path.substr(1).split('/');
@@ -47,19 +47,7 @@ module.exports = function(req, res) {
   result.then(function(data) {
     sendResponse(req, res, 'resource', data.doc);
   }).catch(function(err) {
-    if (err.status === 303) {
-      return res.redirect(303, err.message);
-    }
-
-    if (err.status === 404) {
-      return sendResponse(req, res, '404', {
-        message: err.message
-      }, err.status);
-    }
-
-    sendResponse(req, res, '500', {
-      message: 'Internal Server Error'
-    }, 500);
+    next(err);
   });
 };
 

@@ -275,7 +275,7 @@ function getWkNaam(wkCode) {
 
   return esClient.search(params).then(function(result) {
     if (result.hits.total === 0) {
-      throw new createError.NotFound();
+      return '';
     }
 
     return result.hits.hits[0]._source.doc.properties.WK_NAAM;

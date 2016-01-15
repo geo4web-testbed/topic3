@@ -19,12 +19,12 @@ var reader,
   });
 
 Promise.resolve().then(function() {
-  return esClient.indices.delete({ index: 'wijken_buurten_2014' });
+  return esClient.indices.delete({ index: 'wijken_buurten_2015' });
 }).catch(function(err) {
   // Do nothing when index does not exist
 }).then(function() {
   return esClient.indices.create({
-    index: 'wijken_buurten_2014',
+    index: 'wijken_buurten_2015',
     body: {
       mappings: {
         gemeente: {
@@ -181,20 +181,20 @@ Promise.resolve().then(function() {
     }
   });
 }).then(function() {
-  reader = Promise.promisifyAll(shapefile.reader('./shapefile/gem_2014'));
+  reader = Promise.promisifyAll(shapefile.reader('./shapefile/gem_2015'));
   return reader.readHeaderAsync();
 }).then(function() {
-  return importRecords('wijken_buurten_2014', 'gemeente', 'GM_CODE', 'GM_NAAM');
+  return importRecords('wijken_buurten_2015', 'gemeente', 'GM_CODE', 'GM_NAAM');
 }).then(function() {
-  reader = Promise.promisifyAll(shapefile.reader('./shapefile/wijk_2014'));
+  reader = Promise.promisifyAll(shapefile.reader('./shapefile/wijk_2015'));
   return reader.readHeaderAsync();
 }).then(function() {
-  return importRecords('wijken_buurten_2014', 'wijk', 'WK_CODE', 'WK_NAAM');
+  return importRecords('wijken_buurten_2015', 'wijk', 'WK_CODE', 'WK_NAAM');
 }).then(function() {
-  reader = Promise.promisifyAll(shapefile.reader('./shapefile/buurt_2014'));
+  reader = Promise.promisifyAll(shapefile.reader('./shapefile/buurt_2015'));
   return reader.readHeaderAsync();
 }).then(function() {
-  return importRecords('wijken_buurten_2014', 'buurt', 'BU_CODE', 'BU_NAAM');
+  return importRecords('wijken_buurten_2015', 'buurt', 'BU_CODE', 'BU_NAAM');
 }).catch(function(err) {
   console.error(err);
 });
@@ -257,17 +257,15 @@ function importRecords(index, type, idProperty, nameProperty) {
 
 function getWkNaam(wkCode) {
   var params = {
-    index: 'wijken_buurten_2014',
+    index: 'wijken_buurten_2015',
     type: 'wijk',
     size: 1,
-    query: {
-      filtered: {
-        filter: {
-          term: {
-            doc: {
-              properties: {
-                WK_CODE: wkCode
-              }
+    body: {
+      query: {
+        filtered: {
+          filter: {
+            term: {
+              'doc.properties.WK_CODE': wkCode
             }
           }
         }

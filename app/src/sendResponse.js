@@ -34,10 +34,14 @@ module.exports = function(req, res, template, data, status) {
       res.send(toKML(data));
     },
     'application/nquads': function() {
-      res.send(toQuads(data));
+      jsonld.toRDF(toJsonLD(data), { format: 'application/nquads' }, function(err, quads) {
+        res.send(quads);
+      });
     },
     'application/n-triples': function() {
-      res.send(toTriples(data));
+      jsonld.toRDF(toJsonLD(data), { format: 'application/nquads' }, function(err, quads) {
+        res.send(quads);
+      });
     },
     default: function() {
       res.status(406).end();
@@ -46,24 +50,18 @@ module.exports = function(req, res, template, data, status) {
 };
 
 function toJson(data) {
-  var json = data;
-  json.requestType = 'APPLICATION/JSON'
+  var json = data.properties;
+  json.geo = data.geometry;
   return json;
 }
 
 function toJsonLD(data) {
   var jsonLd = toJson(data);
-  jsonLd.requestType = 'APPLICATION/LD+JSON';
+  jsonLd['@context'] = {
+    'geo': 'http://schema.org/GeoShape',
+    'polygon': 'http://schema.org/polygon'
+  }
+  jsonLd['@type'] = 'http://schema.org/Place';
+  jsonLd.geo = geojson2schema({geoJson: jsonLd.geo});
   return jsonLd;
-}
-
-function toQuads(data) {
-  var context = {};
-  jsonld.toRDF(toJsonLD(data), { format: 'application/nquads', expandContext: context }, function(err, quads) {
-    return quads;
-  });
-}
-
-function toTriples(data) {
-  return toQuads(data);//.replace(new RegExp('<https://geo4web.apiwise.nl> .', 'g'), '.');
 }

@@ -95,7 +95,7 @@ function handleDbpediaResource(uri, pathSegments) {
 
 function getDbpediaSearchParams(uri, pathSegments) {
   var params = {
-    index: 'wijken_buurten_2014',
+    index: 'wijken_buurten_2015',
     id: uri
   };
 
@@ -109,7 +109,7 @@ function getDbpediaSearchParams(uri, pathSegments) {
 
 function handlePldnDoc(uri, pathSegments) {
   return esClient.get({
-    index: 'wijken_buurten_2014',
+    index: 'wijken_buurten_2015',
     type: pathSegments[1],
     id: uri
   }).then(function(result) {
@@ -119,7 +119,7 @@ function handlePldnDoc(uri, pathSegments) {
 
 function handlePldnId(uri, pathSegments) {
   return esClient.exists({
-    index: 'wijken_buurten_2014',
+    index: 'wijken_buurten_2015',
     type: pathSegments[1],
     id: uri
   }).then(function(exists) {
@@ -133,7 +133,7 @@ function handlePldnId(uri, pathSegments) {
 
 function handleRestResource(uri, pathSegments) {
   return esClient.get({
-    index: 'wijken_buurten_2014',
+    index: 'wijken_buurten_2015',
     type: pathSegments[0],
     id: uri
   }).then(function(result) {
@@ -152,7 +152,7 @@ function handleUnstructuredResource(uri, pathSegments) {
   }
 
   return esClient.get({
-    index: 'wijken_buurten_2014',
+    index: 'wijken_buurten_2015',
     type: obj.type,
     id: uri
   }).then(function(result) {
@@ -162,7 +162,7 @@ function handleUnstructuredResource(uri, pathSegments) {
 
 function handleHierarchicalResource(uri, pathSegments) {
   var params = {
-    index: 'wijken_buurten_2014',
+    index: 'wijken_buurten_2015',
     id: uri
   };
 

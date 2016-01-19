@@ -47,7 +47,7 @@ module.exports = function(esClient) {
         fields: [],
         body: {
           sort: [
-            { WK_NAAM: 'asc' }
+            { 'doc.properties.WK_NAAM': 'asc' }
           ],
           query: {
             filtered: {
@@ -92,7 +92,7 @@ module.exports = function(esClient) {
           fields: [],
           body: {
             sort: [
-              { BU_NAAM: 'asc' }
+              { 'doc.properties.BU_NAAM': 'asc' }
             ],
             query: {
               filtered: {

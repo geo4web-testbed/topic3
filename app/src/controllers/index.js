@@ -6,11 +6,11 @@ module.exports = function(esClient) {
   var params = {
     index: 'wijken_buurten_2015',
     type: 'gemeente',
-    fields: [],
     size: 1000,
     body: {
+      _source: 'doc.properties.GM_NAAM',
       sort: [
-        { GM_NAAM: 'asc' }
+        { 'doc.properties.GM_NAAM': 'asc' }
       ]
     }
   };

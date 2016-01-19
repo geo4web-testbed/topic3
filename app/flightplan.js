@@ -5,7 +5,7 @@ var plan = require('flightplan');
 plan.target('production', [
   {
     host: 'geo4web.apiwise.nl',
-    username: 'ec2-user',
+    username: 'centos',
     agent: process.env.SSH_AUTH_SOCK,
     privateKey: process.env.HOME + '/.ssh/geo4web.pem'
   }
@@ -18,5 +18,5 @@ plan.local(function(local) {
     local.find('node_modules -type f', { silent: true }).stdout.split('\n')
   );
 
-  local.transfer(files, '/home/ec2-user/geo4web');
+  local.transfer(files, '/home/centos/geo4web');
 });

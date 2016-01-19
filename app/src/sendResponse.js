@@ -1,9 +1,14 @@
 var jade = require('jade'),
   geojson2schema = require('geojson2schema')
   toKML = require('tokml'),
-  jsonld = require('jsonld');
+  jsonld = require('jsonld'),
+  logger = require('./middleware/logger');
 
 module.exports = function(req, res, template, data, status) {
+  if (data._source && data._source.meta && data._source.meta.uriStrategy) {
+    res.locals.uriStrategy = data._source.meta.uriStrategy;
+  }
+
   if (status !== undefined) {
     res.status(status);
   }
@@ -47,6 +52,8 @@ module.exports = function(req, res, template, data, status) {
       res.status(406).end();
     }
   });
+
+  logger.log(req, res);
 };
 
 function toJson(data) {

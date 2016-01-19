@@ -23,23 +23,23 @@ var logger = new (winston.Logger)({
   transports: transports
 });
 
-module.exports = function(req, res, next) {
-  next();
+module.exports = {
+  log: function(req, res) {
+    var log = {
+      request: {
+        url: req.originalUrl,
+        method: req.method,
+        query: req.query,
+        ip: req.ip,
+        accept: req.get('Accept'),
+        agent: req.get('User-Agent')
+      }
+    };
 
-  var log = {
-    request: {
-      url: req.originalUrl,
-      method: req.method,
-      query: req.query,
-      ip: req.ip,
-      accept: req.get('Accept'),
-      agent: req.get('User-Agent')
+    if (res.locals.uriStrategy) {
+      log.uriStrategy = res.locals.uriStrategy;
     }
-  };
 
-  if (res.locals.uriStrategy) {
-    log.uriStrategy = res.locals.uriStrategy;
+    logger.info(req.method + ' ' + req.originalUrl, log);
   }
-
-  logger.info(req.method + ' ' + req.originalUrl, log);
 };

@@ -1,6 +1,8 @@
 var sendResponse = require('../sendResponse');
 
 module.exports = function(err, req, res, next) {
+  console.error(err.stack);
+
   if (err.status === 303) {
     return res.redirect(303, err.message);
   }

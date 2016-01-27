@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Apiwise <info@apiwise.nl>",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "dependencies": {
     "bluebird": "^3.0.6",
     "elasticsearch": "^10.0.1",

@@ -14,8 +14,7 @@ proj4.defs('RD', '+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 
 var reader,
   uriStrategies = ['dbpedia', 'hierarchical', 'rest', 'pldn', 'unstructured'],
   esClient = new elasticsearch.Client({
-    host: 'https://search-geo4web-if2ippqsoax25uzkvf7qkazw7m.eu-west-1.es.amazonaws.com',
-    // log: 'trace'
+    host: 'https://search-geo4web-if2ippqsoax25uzkvf7qkazw7m.eu-west-1.es.amazonaws.com'
   });
 
 Promise.resolve().then(function() {

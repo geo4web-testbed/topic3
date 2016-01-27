@@ -1,170 +1,161 @@
-var elasticsearch = require('elasticsearch'),
-  createError = require('http-errors'),
+var createError = require('http-errors'),
   sendResponse = require('../sendResponse');
 
-var esClient = new elasticsearch.Client({
-  host: 'https://search-geo4web-if2ippqsoax25uzkvf7qkazw7m.eu-west-1.es.amazonaws.com',
-  log: process.env.NODE_ENV === 'production' ? 'error' : 'debug'
-});
+module.exports = function(esClient) {
+  return function(req, res, next) {
+    var params, matches,
+      path = req.path;
 
-module.exports = function(req, res, next) {
-  var result,
-    matches,
-    uri = 'https://geo4web.apiwise.nl' + req.path,
-    pathSegments = req.path.substr(1).split('/');
-
-  if (matches = uri.match(/^(.+)\.kml$/)) {
-    uri = matches[1];
-    req.headers.accept = 'application/vnd.google-earth.kml+xml';
-  }
-
-  switch (pathSegments[0]) {
-    case 'page':
-      result = handleDbpediaPage(uri, pathSegments);
-      res.locals.uriStrategy = 'dbpedia';
-      break;
-    case 'resource':
-      result = handleDbpediaResource(uri.replace('/resource/', '/page/'), pathSegments);
-      res.locals.uriStrategy = 'dbpedia';
-      break;
-    case 'doc':
-      result = handlePldnDoc(uri, pathSegments);
-      res.locals.uriStrategy = 'pldn';
-      break;
-    case 'id':
-      result = handlePldnId(uri.replace('/id/', '/doc/'), pathSegments);
-      res.locals.uriStrategy = 'pldn';
-      break;
-    case 'gemeente':
-    case 'wijk':
-    case 'buurt':
-      result = handleRestResource(uri, pathSegments);
-      res.locals.uriStrategy = 'rest';
-      break;
-    case 'unstructured':
-      result = handleUnstructuredResource(uri, pathSegments);
-      res.locals.uriStrategy = 'unstructured';
-      break;
-    default:
-      result = handleHierarchicalResource(uri, pathSegments);
-      res.locals.uriStrategy = 'hierarchical';
-  }
-
-  result.then(function(data) {
-    sendResponse(req, res, 'resource', data.doc);
-  }).catch(function(err) {
-    next(err);
-  });
-};
-
-function handleDbpediaPage(uri, pathSegments) {
-  try {
-    var params = getDbpediaSearchParams(uri, pathSegments);
-  } catch(err) {
-    return Promise.reject(err);
-  }
-
-  return esClient.get(params)
-    .then(function(result) {
-      return result._source;
-    });
-}
-
-function handleDbpediaResource(uri, pathSegments) {
-  try {
-    var params = getDbpediaSearchParams(uri, pathSegments);
-  } catch(err) {
-    return Promise.reject(err);
-  }
-
-  return esClient.exists(params)
-    .then(function(exists) {
-      if (!exists) {
-        throw new createError.NotFound();
-      }
-
-      throw createError(303, '/page/' + pathSegments[1]);
-    });
-}
-
-function getDbpediaSearchParams(uri, pathSegments) {
-  var params = {
-    index: 'wijken_buurten_2015',
-    id: uri
-  };
-
-  if (matches = uri.match(/^(.+)_\(gemeente\)$/)) params.type = 'gemeente';
-  else if (matches = uri.match(/^(.+),_(.+)_\(wijk\)$/)) params.type = 'wijk';
-  else if (matches = uri.match(/^(.+),_(.+)_\(buurt\)$/)) params.type = 'buurt';
-  else throw new createError.NotFound();
-
-  return params;
-}
-
-function handlePldnDoc(uri, pathSegments) {
-  return esClient.get({
-    index: 'wijken_buurten_2015',
-    type: pathSegments[1],
-    id: uri
-  }).then(function(result) {
-    return result._source;
-  });
-}
-
-function handlePldnId(uri, pathSegments) {
-  return esClient.exists({
-    index: 'wijken_buurten_2015',
-    type: pathSegments[1],
-    id: uri
-  }).then(function(exists) {
-    if (!exists) {
-      throw new createError.NotFound();
+    // Rewrite KML paths
+    if (matches = path.match(/^(.+)\.kml$/)) {
+      path = matches[1];
+      req.headers.accept = 'application/vnd.google-earth.kml+xml';
     }
 
-    throw createError(303, '/doc/' + pathSegments[1] + '/' + pathSegments[2]);
-  });
-}
+    // Handle DBpedia redirects
+    if (matches = path.match(/^\/resource\/(.*)$/)) {
+      throw createError(303, '/page/' + matches[1]);
+    }
 
-function handleRestResource(uri, pathSegments) {
-  return esClient.get({
-    index: 'wijken_buurten_2015',
-    type: pathSegments[0],
-    id: uri
-  }).then(function(result) {
-    return result._source;
-  });
-}
+    // Handle PLDN redirects
+    if (matches = path.match(/^\/id\/(.*)$/)) {
+      throw createError(303, '/doc/' + matches[1]);
+    }
 
-function handleUnstructuredResource(uri, pathSegments) {
-  var obj;
-  var buffer = new Buffer(pathSegments[1], 'base64');
+    params = {
+      index: 'wijken_buurten_2015',
+      type: '_all',
+      id: 'https://geo4web.apiwise.nl' + path
+    };
 
-  try {
-    obj = JSON.parse(buffer.toString());
-  } catch(err) {
-    return Promise.reject(new createError.NotFound());
-  }
-
-  return esClient.get({
-    index: 'wijken_buurten_2015',
-    type: obj.type,
-    id: uri
-  }).then(function(result) {
-    return result._source;
-  });
-}
-
-function handleHierarchicalResource(uri, pathSegments) {
-  var params = {
-    index: 'wijken_buurten_2015',
-    id: uri
+    return esClient.get(params)
+      .then(enrich)
+      .then(function(data) {
+        res.locals.uriStrategy = data._source.meta.uriStrategy;
+        sendResponse(req, res, 'resource', data);
+      }).catch(function(err) {
+        next(err);
+      });
   };
 
-  if (pathSegments[2]) params.type = 'buurt';
-  else if (pathSegments[1]) params.type = 'wijk';
-  else params.type = 'gemeente';
+  function enrich(data) {
+    if (data._type === 'gemeente') {
+      return esClient.search({
+        index: 'wijken_buurten_2015',
+        type: 'wijk',
+        size: 1000,
+        fields: [],
+        body: {
+          sort: [
+            { WK_NAAM: 'asc' }
+          ],
+          query: {
+            filtered: {
+              filter: {
+                term: {
+                  'doc.properties.GM_CODE': data._source.doc.properties.GM_CODE
+                }
+              }
+            }
+          }
+        }
+      }).then(function(result) {
+        data.quarters = result.hits.hits;
+        return data;
+      });
+    }
 
-  return esClient.get(params).then(function(result) {
-    return result._source;
-  });
-}
+    if (data._type === 'wijk') {
+      return esClient.search({
+        index: 'wijken_buurten_2015',
+        type: 'gemeente',
+        size: 1,
+        fields: [],
+        body: {
+          query: {
+            filtered: {
+              filter: {
+                term: {
+                  'doc.properties.GM_CODE': data._source.doc.properties.GM_CODE
+                }
+              }
+            }
+          }
+        }
+      }).then(function(result) {
+        data.municipality = result.hits.hits[0];
+
+        return esClient.search({
+          index: 'wijken_buurten_2015',
+          type: 'buurt',
+          size: 1000,
+          fields: [],
+          body: {
+            sort: [
+              { BU_NAAM: 'asc' }
+            ],
+            query: {
+              filtered: {
+                filter: {
+                  term: {
+                    'doc.properties.WK_CODE': data._source.doc.properties.WK_CODE
+                  }
+                }
+              }
+            }
+          }
+        }).then(function(result) {
+          data.neighbourhoods = result.hits.hits;
+        });
+      }).then(function(result) {
+        return data;
+      });
+    }
+
+    if (data._type === 'buurt') {
+      return esClient.search({
+        index: 'wijken_buurten_2015',
+        type: 'wijk',
+        size: 1,
+        fields: [],
+        body: {
+          query: {
+            filtered: {
+              filter: {
+                term: {
+                  'doc.properties.WK_CODE': data._source.doc.properties.WK_CODE
+                }
+              }
+            }
+          }
+        }
+      }).then(function(result) {
+        data.quarter = result.hits.hits[0];
+
+        return esClient.search({
+          index: 'wijken_buurten_2015',
+          type: 'gemeente',
+          size: 1,
+          fields: [],
+          body: {
+            query: {
+              filtered: {
+                filter: {
+                  term: {
+                    'doc.properties.GM_CODE': data._source.doc.properties.GM_CODE
+                  }
+                }
+              }
+            }
+          }
+        }).then(function(result) {
+          data.municipality = result.hits.hits[0];
+        });
+      }).then(function(result) {
+        return data;
+      });
+    }
+
+    return data;
+  };
+};

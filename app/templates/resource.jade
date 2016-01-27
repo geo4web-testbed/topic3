@@ -1,18 +1,33 @@
 extends _layout
 
 block jsonld
-  script(type='application/ld+json')!='{"@context": "http://schema.org", "@type": "Place", "geo": ' + JSON.stringify(geojson2schema({geoJson: object.geometry})) + '}'
+  script(type='application/ld+json')!='{"@context": "http://schema.org", "@type": "Place", "geo": ' + JSON.stringify(geojson2schema({geoJson: data._source.doc.geometry})) + '}'
 
 block vars
-  if object.properties['BU_NAAM']
-    - var title = object.properties['BU_NAAM']
-  else if object.properties['WK_NAAM']
-    - var title = object.properties['WK_NAAM']
-  else if object.properties['GM_NAAM']
-    - var title = object.properties['GM_NAAM']
+  if data._type == 'buurt'
+    - var title = data._source.doc.properties['BU_NAAM']
+  else if data._type == 'wijk'
+    - var title = data._source.doc.properties['WK_NAAM']
+  else if data._type == 'gemeente'
+    - var title = data._source.doc.properties['GM_NAAM']
 
 block content
   div.row
+    ol.breadcrumb
+      li
+        a(href='/')='Home'
+      if data._type == 'gemeente'
+        li=data._source.doc.properties['GM_NAAM']
+      if data._type == 'wijk'
+        li
+          a(href=data.municipality._id)=data._source.doc.properties['GM_NAAM']
+        li=data._source.doc.properties['WK_NAAM']
+      if data._type == 'buurt'
+        li
+          a(href=data.municipality._id)=data._source.doc.properties['GM_NAAM']
+        li
+          a(href=data.quarter._id)=data._source.doc.properties['WK_NAAM']
+        li=data._source.doc.properties['BU_NAAM']
     .col-md-6
       table.table
         thead
@@ -20,9 +35,22 @@ block content
             th='Property'
             th='Value'
         tbody
-        each value, property in object.properties
+        each value, property in data._source.doc.properties
           tr
             td=property
             td=value
     .col-md-6.col-map
       .map-container
+      .sub
+        if data._type == 'gemeente'
+          h2="Wijken"
+          ul
+            each quarter in data.quarters
+              li
+                a(href=quarter._id)=quarter.sort
+        if data._type == 'wijk'
+          h2="Buurten"
+          ul
+            each neighbourhood in data.neighbourhoods
+              li
+                a(href=neighbourhood._id)=neighbourhood.sort

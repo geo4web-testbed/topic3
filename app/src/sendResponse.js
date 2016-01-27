@@ -13,7 +13,7 @@ module.exports = function(req, res, template, data, status) {
       try {
         res.send(
           jade.renderFile('./templates/' + template + '.jade', {
-            object: data,
+            data: data,
             geojson2schema: geojson2schema
           })
         );
@@ -22,24 +22,24 @@ module.exports = function(req, res, template, data, status) {
       }
     },
     'application/vnd.geo+json': function() {
-      res.send(data);
+      res.send(data._source.doc);
     },
     'application/json': function() {
-      res.send(toJson(data));
+      res.send(toJson(data._source.doc));
     },
     'application/ld+json': function() {
-      res.send(toJsonLD(data));
+      res.send(toJsonLD(data._source.doc));
     },
     'application/vnd.google-earth.kml+xml': function() {
-      res.send(toKML(data));
+      res.send(toKML(data._source.doc));
     },
     'application/nquads': function() {
-      jsonld.toRDF(toJsonLD(data), { format: 'application/nquads' }, function(err, quads) {
+      jsonld.toRDF(toJsonLD(data._source.doc), { format: 'application/nquads' }, function(err, quads) {
         res.send(quads);
       });
     },
     'application/n-triples': function() {
-      jsonld.toRDF(toJsonLD(data), { format: 'application/nquads' }, function(err, quads) {
+      jsonld.toRDF(toJsonLD(data._source.doc), { format: 'application/nquads' }, function(err, quads) {
         res.send(quads);
       });
     },

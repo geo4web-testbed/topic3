@@ -7,12 +7,8 @@ module.exports = function(esClient) {
     index: 'wijken_buurten_2015',
     type: 'gemeente',
     size: 1000,
-    body: {
-      _source: 'doc.properties.GM_NAAM',
-      sort: [
-        { 'doc.properties.GM_NAAM': 'asc' }
-      ]
-    }
+    sort: 'doc.properties.GM_NAAM',
+    _source: 'doc.properties.GM_NAAM'
   };
 
   return function(req, res) {

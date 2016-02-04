@@ -181,8 +181,8 @@ mapping = {
     }
 }
 
-es.indices.delete(index='wijken_buurten_2015')
-es.indices.create(index='wijken_buurten_2015', body=mapping)
+# es.indices.delete(index='wijken_buurten_2015')
+# es.indices.create(index='wijken_buurten_2015', body=mapping)
 
 # Amersfoort / RD New
 projSource = osr.SpatialReference()
@@ -195,6 +195,8 @@ projTarget.ImportFromEPSG(4326)
 transform = osr.CoordinateTransformation(projSource, projTarget)
 
 def escapeValue(value):
+    if (value == None):
+        return 'Onbekend'
     return value.replace(' ', '_')
 
 def getWkNaam(wkCode):
@@ -245,6 +247,8 @@ uriGenerators = {
 }
 
 def getUri(feature, type, idProperty, nameProperty):
+    print feature.GetField(idProperty)
+    print feature.GetField(nameProperty)
     uriStrategy = int(feature.GetField('GM_CODE')[2:]) % 5
     uri = uriGenerators[uriStrategy](feature, type, idProperty, nameProperty)
     print uri
@@ -268,19 +272,19 @@ def getFeatures(layer, type, idProperty, nameProperty):
             }
         }
 
-reader = ogr.Open('data/gem_2015.shp')
-layer = reader.GetLayer()
-
-for ok, result in streaming_bulk(es, getFeatures(layer, 'gemeente', 'GM_CODE', 'GM_NAAM'), index='wijken_buurten_2015', doc_type='gemeente', chunk_size=25, raise_on_error=False):
-    if not ok:
-        print('Failed')
-
-reader = ogr.Open('data/Wijk_2015.shp')
-layer = reader.GetLayer()
-
-for ok, result in streaming_bulk(es, getFeatures(layer, 'wijk', 'WK_CODE', 'WK_NAAM'), index='wijken_buurten_2015', doc_type='wijk', chunk_size=25, raise_on_error=False):
-    if not ok:
-        print('Failed')
+# reader = ogr.Open('data/gem_2015.shp')
+# layer = reader.GetLayer()
+#
+# for ok, result in streaming_bulk(es, getFeatures(layer, 'gemeente', 'GM_CODE', 'GM_NAAM'), index='wijken_buurten_2015', doc_type='gemeente', chunk_size=25, raise_on_error=False):
+#     if not ok:
+#         print('Failed')
+#
+# reader = ogr.Open('data/Wijk_2015.shp')
+# layer = reader.GetLayer()
+#
+# for ok, result in streaming_bulk(es, getFeatures(layer, 'wijk', 'WK_CODE', 'WK_NAAM'), index='wijken_buurten_2015', doc_type='wijk', chunk_size=25, raise_on_error=False):
+#     if not ok:
+#         print('Failed')
 
 reader = ogr.Open('data/Buurt_2015.shp')
 layer = reader.GetLayer()

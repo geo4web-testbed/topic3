@@ -2,7 +2,21 @@
 
 This is the repository for research topic 3 of the Geonovum Testbed 'Spatial data on the web'. More information can be found on the [Wiki section](https://github.com/geo4web-testbed/topic3/wiki) of this repository.
 
+## Development
+
+Build & run all containers:
+
+```
+docker-compose up
+```
+
 ## Import
+
+Switch to import dir:
+
+```
+cd import
+```
 
 Build & run the container:
 

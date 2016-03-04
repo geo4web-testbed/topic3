@@ -5,8 +5,8 @@ var jade = require('jade'),
   logger = require('./middleware/logger');
 
 module.exports = function(req, res, template, data, status) {
-  if (data._source && data._source.meta && data._source.meta.uriStrategy) {
-    res.locals.uriStrategy = data._source.meta.uriStrategy;
+  if (data._source && data._source._uri_strategy) {
+    res.locals.uriStrategy = data._source._uri_strategy;
   }
 
   if (status !== undefined) {

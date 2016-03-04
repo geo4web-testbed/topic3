@@ -1,15 +1,15 @@
 extends _layout
 
 block jsonld
-  script(type='application/ld+json')!='{"@context": "http://schema.org", "@type": "Place", "geo": ' + JSON.stringify(geojson2schema({geoJson: data._source.doc.geometry})) + '}'
+  script(type='application/ld+json')!='{"@context": "http://schema.org", "@type": "Place", "geo": ' + JSON.stringify(geojson2schema({geoJson: data._source.geometry})) + '}'
 
 block vars
   if data._type == 'buurt'
-    - var title = data._source.doc.properties['BU_NAAM']
+    - var title = data._source.properties['BU_NAAM']
   else if data._type == 'wijk'
-    - var title = data._source.doc.properties['WK_NAAM']
+    - var title = data._source.properties['WK_NAAM']
   else if data._type == 'gemeente'
-    - var title = data._source.doc.properties['GM_NAAM']
+    - var title = data._source.properties['GM_NAAM']
 
 block content
   div.row
@@ -17,17 +17,17 @@ block content
       li
         a(href='/')='Home'
       if data._type == 'gemeente'
-        li=data._source.doc.properties['GM_NAAM']
+        li=data._source.properties['GM_NAAM']
       if data._type == 'wijk'
         li
-          a(href=data.municipality._id)=data._source.doc.properties['GM_NAAM']
-        li=data._source.doc.properties['WK_NAAM']
+          a(href=data.municipality._id)=data._source.properties['GM_NAAM']
+        li=data._source.properties['WK_NAAM']
       if data._type == 'buurt'
         li
-          a(href=data.municipality._id)=data._source.doc.properties['GM_NAAM']
+          a(href=data.municipality._id)=data._source.properties['GM_NAAM']
         li
-          a(href=data.quarter._id)=data._source.doc.properties['WK_NAAM']
-        li=data._source.doc.properties['BU_NAAM']
+          a(href=data.quarter._id)=data._source.properties['WK_NAAM']
+        li=data._source.properties['BU_NAAM']
     .col-md-6
       table.table
         thead
@@ -35,7 +35,7 @@ block content
             th='Property'
             th='Value'
         tbody
-        each value, property in data._source.doc.properties
+        each value, property in data._source.properties
           tr
             td=property
             td=value

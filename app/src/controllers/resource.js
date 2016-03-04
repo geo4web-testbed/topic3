@@ -1,10 +1,13 @@
-var createError = require('http-errors'),
+const createError = require('http-errors'),
   sendResponse = require('../sendResponse');
+
+const ES_INDEX = 'geo4web';
+const BASE_URI = 'https://geo4web.apiwise.nl';
 
 module.exports = function(esClient) {
   return function(req, res, next) {
     var params, matches,
-      path = req.path;
+      path = decodeURIComponent(req.path);
 
     // Rewrite KML paths
     if (matches = path.match(/^(.+)\.kml$/)) {
@@ -23,15 +26,15 @@ module.exports = function(esClient) {
     }
 
     params = {
-      index: 'wijken_buurten_2015',
+      index: ES_INDEX,
       type: '_all',
-      id: 'https://geo4web.apiwise.nl' + path
+      id: BASE_URI + path
     };
 
     return esClient.get(params)
       .then(enrich)
       .then(function(data) {
-        res.locals.uriStrategy = data._source.meta.uriStrategy;
+        res.locals.uriStrategy = data._source._uri_strategy;
         sendResponse(req, res, 'resource', data);
       }).catch(function(err) {
         next(err);
@@ -41,19 +44,17 @@ module.exports = function(esClient) {
   function enrich(data) {
     if (data._type === 'gemeente') {
       return esClient.search({
-        index: 'wijken_buurten_2015',
+        index: ES_INDEX,
         type: 'wijk',
         size: 1000,
         fields: [],
         body: {
-          sort: [
-            { 'doc.properties.WK_NAAM': 'asc' }
-          ],
+          sort: '_self_name',
           query: {
             filtered: {
               filter: {
                 term: {
-                  'doc.properties.GM_CODE': data._source.doc.properties.GM_CODE
+                  '_parent_id': data._source._self_id
                 }
               }
             }
@@ -67,7 +68,7 @@ module.exports = function(esClient) {
 
     if (data._type === 'wijk') {
       return esClient.search({
-        index: 'wijken_buurten_2015',
+        index: ES_INDEX,
         type: 'gemeente',
         size: 1,
         fields: [],
@@ -76,7 +77,7 @@ module.exports = function(esClient) {
             filtered: {
               filter: {
                 term: {
-                  'doc.properties.GM_CODE': data._source.doc.properties.GM_CODE
+                  '_self_id': data._source._parent_id
                 }
               }
             }
@@ -86,19 +87,17 @@ module.exports = function(esClient) {
         data.municipality = result.hits.hits[0];
 
         return esClient.search({
-          index: 'wijken_buurten_2015',
+          index: ES_INDEX,
           type: 'buurt',
           size: 1000,
           fields: [],
           body: {
-            sort: [
-              { 'doc.properties.BU_NAAM': 'asc' }
-            ],
+            sort: '_self_name',
             query: {
               filtered: {
                 filter: {
                   term: {
-                    'doc.properties.WK_CODE': data._source.doc.properties.WK_CODE
+                    '_parent_id': data._source._self_id
                   }
                 }
               }
@@ -114,7 +113,7 @@ module.exports = function(esClient) {
 
     if (data._type === 'buurt') {
       return esClient.search({
-        index: 'wijken_buurten_2015',
+        index: ES_INDEX,
         type: 'wijk',
         size: 1,
         fields: [],
@@ -123,7 +122,7 @@ module.exports = function(esClient) {
             filtered: {
               filter: {
                 term: {
-                  'doc.properties.WK_CODE': data._source.doc.properties.WK_CODE
+                  '_self_id': data._source._parent_id
                 }
               }
             }
@@ -133,7 +132,7 @@ module.exports = function(esClient) {
         data.quarter = result.hits.hits[0];
 
         return esClient.search({
-          index: 'wijken_buurten_2015',
+          index: ES_INDEX,
           type: 'gemeente',
           size: 1,
           fields: [],
@@ -142,7 +141,7 @@ module.exports = function(esClient) {
               filtered: {
                 filter: {
                   term: {
-                    'doc.properties.GM_CODE': data._source.doc.properties.GM_CODE
+                    '_self_id': data._source.properties.GM_CODE
                   }
                 }
               }

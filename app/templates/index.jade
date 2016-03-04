@@ -15,4 +15,4 @@ block content
     ul
       each municipality in data.municipalities
         li
-          a(href=municipality._id)=municipality._source.doc.properties.GM_NAAM
+          a(href=municipality._id)=municipality._source._self_name

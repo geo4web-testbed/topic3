@@ -27,24 +27,24 @@ module.exports = function(req, res, template, data, status) {
       }
     },
     'application/vnd.geo+json': function() {
-      res.send(data._source.doc);
+      res.send(data._source);
     },
     'application/json': function() {
-      res.send(toJson(data._source.doc));
+      res.send(toJson(data._source));
     },
     'application/ld+json': function() {
-      res.send(toJsonLD(data._source.doc));
+      res.send(toJsonLD(data._source));
     },
     'application/vnd.google-earth.kml+xml': function() {
-      res.send(toKML(data._source.doc));
+      res.send(toKML(data._source));
     },
     'application/nquads': function() {
-      jsonld.toRDF(toJsonLD(data._source.doc), { format: 'application/nquads' }, function(err, quads) {
+      jsonld.toRDF(toJsonLD(data._source), { format: 'application/nquads' }, function(err, quads) {
         res.send(quads);
       });
     },
     'application/n-triples': function() {
-      jsonld.toRDF(toJsonLD(data._source.doc), { format: 'application/nquads' }, function(err, quads) {
+      jsonld.toRDF(toJsonLD(data._source), { format: 'application/nquads' }, function(err, quads) {
         res.send(quads);
       });
     },

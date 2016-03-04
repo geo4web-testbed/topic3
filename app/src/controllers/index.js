@@ -4,11 +4,11 @@ var createError = require('http-errors'),
 
 module.exports = function(esClient) {
   var params = {
-    index: 'wijken_buurten_2015',
+    index: 'geo4web',
     type: 'gemeente',
     size: 1000,
-    sort: 'doc.properties.GM_NAAM',
-    _source: 'doc.properties.GM_NAAM'
+    sort: '_self_name',
+    _source: ['_self_name']
   };
 
   return function(req, res) {

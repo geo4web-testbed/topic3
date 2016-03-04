@@ -1,0 +1,27 @@
+version: "2"
+
+services:
+  app:
+    build: ./app
+    network_mode: bridge
+    links:
+      - elasticsearch
+    ports:
+      - "3000:3000"
+    volumes:
+      - $PWD/app:/src
+    environment:
+      NODE_ENV: development
+      DEBUG: "*"
+    
+  elasticsearch:
+    image: elasticsearch:2.2
+    network_mode: bridge
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+
+volumes:
+  elasticsearch:
+    external: false

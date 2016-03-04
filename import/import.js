@@ -43,8 +43,10 @@ Promise.resolve()
     },
     function (callback) {
       // Exceptions for CBS wijken_buurten_2015
-      if (feature.fields.get('WATER') === 'JA' || feature.fields.get('GM_CODE') === 'GM9999') {
-        return callback();
+      if (ES_TYPE === 'gemeente' || ES_TYPE === 'wijk' || ES_TYPE === 'buurt') {
+        if (feature.fields.get('WATER') === 'JA' || feature.fields.get('GM_CODE') === 'GM9999') {
+          return callback();
+        }
       }
 
       result = Promise.resolve(feature.fields.toObject());
@@ -62,9 +64,14 @@ Promise.resolve()
 
       result
         .then((properties) => {
-          let modField = 'GM_CODE',
-            numId = parseInt(properties[modField].replace(/\D/g, '')),
+          let uriStrategy;
+
+          if (ES_TYPE === 'gemeente' || ES_TYPE === 'wijk' || ES_TYPE === 'buurt') {
+            let numId = parseInt(properties['GM_CODE'].replace(/\D/g, ''));
             uriStrategy = uriStrategies[numId % uriStrategies.length];
+          } else {
+            uriStrategy = 'pldn';
+          }
 
           let geometry = transform(feature);
 

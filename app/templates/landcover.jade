@@ -1,0 +1,15 @@
+extends _layout
+
+block vars
+  - var title = 'Landcover data'
+
+block content
+  div.row
+    p
+      :markdown
+        This is the endpoint for the dutch landcover data. You can navigate through
+        the data using the collections below.
+    hr
+    ul
+      li
+        a(href='landcover/bestemmingsplangebieden')='Bestemmingsplangebieden'

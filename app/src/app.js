@@ -7,7 +7,7 @@ var express = require('express'),
 var app = express();
 
 var esClient = new elasticsearch.Client({
-  host: 'elasticsearch:9200',
+  host: 'elasticsearch',
   log: process.env.NODE_ENV === 'production' ? 'error' : 'debug'
 });
 
@@ -22,6 +22,9 @@ app.use(express.static('assets', { index: false }));
 
 // Catch-all controller
 app.get('/', require('./controllers/index')(esClient));
+app.get('/landcover', require('./controllers/landcover')(esClient));
+app.get('/landcover/*/*', require('./controllers/landcover_resource')(esClient));
+app.get('/landcover/*', require('./controllers/landcover_collection')(esClient));
 app.get('/sitemap(.*)?.xml.gz', require('./controllers/sitemap')(esClient));
 app.get('*', require('./controllers/resource')(esClient));
 

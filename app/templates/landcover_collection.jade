@@ -1,0 +1,15 @@
+extends _layout
+
+block vars
+  - var title = 'Landcover data - Bestemmingsplangebieden'
+
+block content
+  div.row
+    p
+      :markdown
+        Bestemmingsplangebieden
+    hr
+    ul
+      each area in data.areas
+        li
+          a(href='bestemmingsplangebieden/' + area._id.replace('https://geo4web.apiwise.nl/doc/bestemmingsplangebied/', ''))=area._source._self_name

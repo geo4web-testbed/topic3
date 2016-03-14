@@ -1,0 +1,41 @@
+extends _layout
+
+block jsonld
+  script(type='application/ld+json')!='{"@context": "http://schema.org", "@type": "Place", "geo": ' + JSON.stringify(geojson2schema({geoJson: data._source.geometry})) + '}'
+
+block vars
+  - var title = data._source.properties['identificatie']
+
+block content
+  div.row
+    ol.breadcrumb
+      li
+        a(href='/')='Home'
+      li
+        a(href='/landcover')='Landcover'
+      li
+        a(href='/landcover/bestemmingsplangebieden')='Bestemmingsplangebieden'
+      li=data._source.properties['identificatie']
+    .col-md-6
+      table.table
+        thead
+          tr
+            th='Property'
+            th='Value'
+        tbody
+        each value, property in data._source.properties
+          if property.indexOf('verwijzingNaar') > -1
+            tr
+              td(colspan=2)=property
+                if value              
+                  ol
+                    each link in value.split(',')
+                      li
+                        a(href=link)=link.substr(link.lastIndexOf('/') + 1)                        
+          else
+            tr
+              td=property
+              td=value
+    .col-md-6.col-map
+      .map-container
+      .sub

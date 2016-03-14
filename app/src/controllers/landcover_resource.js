@@ -24,7 +24,7 @@ module.exports = function(esClient) {
 
     return esClient.get(params)
       .then(function(data) {
-        data._source = simplify(data._source, 0.001, 5);
+        data._source = simplify(data._source, 0.0001, 5);
         res.locals.uriStrategy = data._source._uri_strategy;
         sendResponse(req, res, 'landcover_resource', data);
       }).catch(function(err) {

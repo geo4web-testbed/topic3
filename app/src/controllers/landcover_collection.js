@@ -25,7 +25,7 @@ module.exports = function(esClient) {
 
     esClient.search(params).then(function(result) {
       sendResponse(req, res, 'landcover_collection', {
-        areas: result.hits.hits,
+        items: result.hits.hits,
         currentPage: currentPage,
         numPages: 25
       });

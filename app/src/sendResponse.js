@@ -58,24 +58,24 @@ module.exports = function(req, res, template, data, status) {
 };
 
 function toJson(data) {
-  if (data.areas) {
-    return data.areas.map(function(feature) {
+  if (data.items) {
+    return data.items.map(function(feature) {
       feature._source = simplify(feature._source, 0.0001, 5);
-      return toJson(feature._source);
+      return toJson(feature);
     });
   }
 
-  var json = data.properties;
-  json.geo = data.geometry;
+  var json = data._source.properties;
+  json.geo = data._source.geometry;
 
   return json;
 }
 
 function toJsonLD(data) {
-  if (data.areas) {
-    return data.areas.map(function(feature) {
+  if (data.items) {
+    return data.items.map(function(feature) {
       feature._source = simplify(feature._source, 0.0001, 5);
-      return toJsonLD(feature._source);
+      return toJsonLD(feature);
     });
   }
 

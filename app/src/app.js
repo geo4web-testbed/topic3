@@ -7,7 +7,7 @@ var express = require('express'),
 var app = express();
 
 var esClient = new elasticsearch.Client({
-  host: 'elasticsearch',
+  host: 'http://ec2-52-49-0-78.eu-west-1.compute.amazonaws.com:9200',
   log: process.env.NODE_ENV === 'production' ? 'error' : 'debug'
 });
 

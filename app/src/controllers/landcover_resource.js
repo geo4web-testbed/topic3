@@ -1,5 +1,6 @@
 const createError = require('http-errors'),
-  sendResponse = require('../sendResponse');
+  sendResponse = require('../sendResponse'),
+  simplify = require('../simplify');
 
 const ES_INDEX = 'geo4web';
 const BASE_URI = 'https://geo4web.apiwise.nl';
@@ -23,6 +24,7 @@ module.exports = function(esClient) {
 
     return esClient.get(params)
       .then(function(data) {
+        data._source = simplify(data._source, 0.001, 5);
         res.locals.uriStrategy = data._source._uri_strategy;
         sendResponse(req, res, 'landcover_resource', data);
       }).catch(function(err) {

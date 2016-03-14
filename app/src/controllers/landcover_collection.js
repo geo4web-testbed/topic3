@@ -14,8 +14,10 @@ module.exports = function(esClient) {
   return function(req, res) {
     esClient.search(params).then(function(result) {
       sendResponse(req, res, 'landcover_collection', {
-      areas: result.hits.hits
+        areas: result.hits.hits
       });
+    }).catch(err => {
+      console.error(err);
     });
   };
 };

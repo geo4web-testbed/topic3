@@ -16,6 +16,8 @@ module.exports = function(esClient) {
       sendResponse(req, res, 'index', {
         municipalities: result.hits.hits
       });
+    }).catch(err => {
+      console.error(err);
     });
   };
 };

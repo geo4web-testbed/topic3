@@ -4,7 +4,7 @@ block jsonld
   script(type='application/ld+json')!='{"@context": "http://schema.org", "@type": "Place", "geo": ' + JSON.stringify(geojson2schema({geoJson: data._source.geometry})) + '}'
 
 block vars
-  - var title = data._source.properties['identificatie']
+  - var title = data._source._self_name
 
 block content
   div.row
@@ -14,7 +14,7 @@ block content
       li
         a(href='/landcover')='Landcover'
       li
-        a(href='/landcover/bestemmingsplangebieden')='Bestemmingsplangebieden'
+        a(href='/landcover/bestemmingsplangebied')='Bestemmingsplangebieden'
       li=data._source.properties['identificatie']
     .col-md-6
       table.table

@@ -47,6 +47,8 @@ module.exports = function(esClient) {
       index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.wijk.kml.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
       index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.buurt.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
       index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.buurt.kml.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
+      index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.bestemmingsplangebied.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
+      index += '<sitemap><loc>https://geo4web.apiwise.nl/sitemap.bestemmingsplangebied.kml.xml.gz</loc><lastmod>' + new Date().toISOString() + '</lastmod></sitemap>';
       index += '</sitemapindex>';
 
       res.header('Content-Type', 'application/xml');

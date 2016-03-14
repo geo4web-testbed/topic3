@@ -8,7 +8,7 @@ const BASE_URI = 'https://geo4web.apiwise.nl';
 module.exports = function(esClient) {
   return function(req, res, next) {
     var params, matches,
-      path = decodeURIComponent(req.path.replace('landcover/bestemmingsplangebieden', 'doc/bestemmingsplangebied'));
+      path = decodeURIComponent(req.path);
 
     // Rewrite KML paths
     if (matches = path.match(/^(.+)\.kml$/)) {

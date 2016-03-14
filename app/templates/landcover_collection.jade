@@ -12,9 +12,9 @@ block content
     ul
       each area in data.areas
         li
-          a(href='bestemmingsplangebieden/' + area._id.replace('https://geo4web.apiwise.nl/doc/bestemmingsplangebied/', ''))=area._source._self_name
+          a(href=area._id)=area._source._self_name
     nav
       ul.pagination
         - for(var page = 1; page <= data.numPages; ++page)
           li
-            a(href='bestemmingsplangebieden?page='+page)= page
+            a(href='/landcover/bestemmingsplangebied?page='+page)= page

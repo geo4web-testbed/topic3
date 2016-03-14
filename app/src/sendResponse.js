@@ -2,7 +2,8 @@ var jade = require('jade'),
   geojson2schema = require('geojson2schema')
   toKML = require('tokml'),
   jsonld = require('jsonld'),
-  logger = require('./middleware/logger');
+  logger = require('./middleware/logger'),
+  simplify = require('./simplify');
 
 module.exports = function(req, res, template, data, status) {
   if (data._source && data._source._uri_strategy) {
@@ -30,10 +31,10 @@ module.exports = function(req, res, template, data, status) {
       res.send(data._source);
     },
     'application/json': function() {
-      res.send(toJson(data._source));
+      res.send(toJson(data));
     },
     'application/ld+json': function() {
-      res.send(toJsonLD(data._source));
+      res.send(toJsonLD(data));
     },
     'application/vnd.google-earth.kml+xml': function() {
       res.send(toKML(data._source));
@@ -57,12 +58,27 @@ module.exports = function(req, res, template, data, status) {
 };
 
 function toJson(data) {
+  if (data.areas) {
+    return data.areas.map(function(feature) {
+      feature._source = simplify(feature._source, 0.0001, 5);
+      return toJson(feature._source);
+    });
+  }
+
   var json = data.properties;
   json.geo = data.geometry;
+
   return json;
 }
 
 function toJsonLD(data) {
+  if (data.areas) {
+    return data.areas.map(function(feature) {
+      feature._source = simplify(feature._source, 0.0001, 5);
+      return toJsonLD(feature._source);
+    });
+  }
+
   var jsonLd = toJson(data);
   jsonLd['@context'] = {
     'geo': 'http://schema.org/GeoShape',

@@ -6,14 +6,22 @@ module.exports = function(esClient) {
   var params = {
     index: 'geo4web',
     type: 'bestemmingsplangebied',
-    size: 1000,
     sort: '_self_name',
     _source: ['_self_name']
   };
 
   return function(req, res) {
-    const currentPage = Number(req.query.page) || 1;
-    params.from = (currentPage - 1) * 1000;
+    var currentPage = Number(req.query.page) || 1;
+
+    params.size = 1000;
+    params._source = ['_self_name'];
+
+    if (req.accepts(['text/html', 'application/json', 'application/ld+json']).indexOf('json') >= 0) {
+      params.size = 20;
+      delete params._source;
+    }
+
+    params.from = (currentPage - 1) * params.size;
 
     esClient.search(params).then(function(result) {
       sendResponse(req, res, 'landcover_collection', {

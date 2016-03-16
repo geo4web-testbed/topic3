@@ -40,12 +40,12 @@ module.exports = function(req, res, template, data, status) {
       res.send(toKML(data._source));
     },
     'application/nquads': function() {
-      jsonld.toRDF(toJsonLD(data._source), { format: 'application/nquads' }, function(err, quads) {
+      jsonld.toRDF(toJsonLD(data), { format: 'application/nquads' }, function(err, quads) {
         res.send(quads);
       });
     },
     'application/n-triples': function() {
-      jsonld.toRDF(toJsonLD(data._source), { format: 'application/nquads' }, function(err, quads) {
+      jsonld.toRDF(toJsonLD(data), { format: 'application/nquads' }, function(err, quads) {
         res.send(quads);
       });
     },

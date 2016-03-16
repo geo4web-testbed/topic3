@@ -29,7 +29,7 @@ module.exports = function(esClient) {
       sendResponse(req, res, 'landcover_collection', {
         items: result.hits.hits,
         currentPage: currentPage,
-        numPages: 25
+        numPages: Math.ceil(result.hits.total / params.size)
       });
     }).catch(err => {
       console.error(err);

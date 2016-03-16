@@ -1,0 +1,143 @@
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: "Land cover data"
+  contact:
+    name: "Apiwise"
+    url: "geo4web.apiwise.nl"
+    email: "info@apiwise.nl"
+host: "geo4web.apiwise.nl"
+basePath: "/landcover"
+schemes:
+  - "https"
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /bestemmingsplangebied:
+    get:
+      summary: "Alle bestemmingsplangebieden"
+      parameters:
+        - name: "page"
+          in: "query"
+          type: "integer"
+          required: false
+          default: 1
+          description: "Page number (default 1)"
+        - name: "q"
+          in: "query"
+          type: "string"
+          required: false
+          description: "Search query"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Bestemmingsplangebied"
+  /bestemmingsplangebied/{id}:
+    get:
+      summary: "Een bestemmingsplangebied"
+      parameters:
+        - name: "id"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Bestemmingsplan ID"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Bestemmingsplangebied"
+definitions:
+  Bestemmingsplangebied:
+    type: "object"
+    properties:
+      gml_id:
+        type: "string"
+        example: "BPG_25955"
+      fid:
+        type: "integer"
+        example: 25955
+      BeleidsmatigVerantwoordelijkeOverheid:
+        type: "string"
+        example: "gemeentelijke overheid"
+      besluitnummer:
+        type: "string"
+        example: "2011-0102"
+      datum:
+        type: "string"
+        example: "2011-11-25"
+      digitaalGewaarmerkt:
+        type: "string"
+        example: "ja - meer informatie: WMS layers DW:Plangebied en DW:Onderdelen resp. WFS feature types PlangebiedDigitaalWaarmerk en OnderdelenDigitaalWaarmerk"
+      historisch:
+        type: "integer"
+        example: 0
+      identificatie:
+        type: "string"
+        example: "NL.IMRO.0301.50bp1202Oranjeln13-oh01"
+      naam:
+        type: "string"
+        example: "Hoek Oranjelaan-Beukenlaan"
+      naamOverheid:
+        type: "string"
+        example: "Zutphen"
+      ondergrond:
+        type: "string"
+        example: "o_NL.IMRO.0301.50bp1202Oranjeln13-oh01.dgn"
+      overheidscode:
+        type: "integer"
+        example: 301
+      plangebied:
+        type: "string"
+        example: "NL.IMRO.0301.50bp1202Oranjeln13-oh01"
+      planstatus:
+        type: "string"
+        example: "onherroepelijk"
+      typePlan:
+        type: "string"
+        example: "bestemmingsplan"
+      versieIMRO:
+        type: "string"
+        example: "IMRO2008"
+      verwijzingNaarExternPlan:
+        type: "string"
+        example: "http://ruimtelijkeplannen.nl/documents/NL.IMRO.0301.50bp1202Oranjeln13-oh01.html"
+      verwijzingNaarTekst:
+        type: "string"
+        example: "http://ruimtelijkeplannen.nl/documents/NL.IMRO.0301.50bp1202Oranjeln13-oh01.html"
+      verwijzingNaarVaststellingsbesluit:
+        type: "string"
+        example: "http://ruimtelijkeplannen.nl/documents/NL.IMRO.0301.50bp1202Oranjeln13-oh01.html"
+      verwijzingNorm:
+        type: "string"
+        example: "IMRO2008, PRBP2008"
+      dossierID:
+        type: "string"
+        example: "NL.IMRO.0301.50bp1202Oranjeln13"
+      dossierStatus:
+        type: "string"
+        example: "geheel onherroepelijk in werking"
+      gemeenteCode:
+        type: "string"
+      provincieCode:
+        type: "string"
+      woonplaatsNaam:
+        type: "string"
+      locatieNaam:
+        type: "string"
+      verwijzingNaarObjectgerichteTekst:
+        type: "string"
+      geo:
+        type: "object"
+        properties:
+          type:
+            type: "string"
+            example: "Polygon"
+          coordinates:
+            type: "array"
+            items:
+              type: "integer"
